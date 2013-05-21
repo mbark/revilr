@@ -1,0 +1,10 @@
+{
+  "name": "Revilr",
+  "description": "Minimalist link sharing for Chrome. Today.",
+  "version": "0.1",
+  "permissions": ["contextMenus"],
+  "background": {
+    "scripts": ["sample.js"]
+  },
+  "manifest_version": 2
+}
