@@ -5,39 +5,49 @@ import (
     "net/http"
 )
 
-func linkHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method == "POST" {
-        fmt.Println("Received link revil!");
-        fmt.Println("Url:", r.FormValue("url"));
-        fmt.Println("Comment:", r.FormValue("c"));
-        fmt.Println();
+type revil struct {
+    rType string
+    rUrl string
+    rComment string
+}
+
+func getString(r revil) string {
+    result := "Url: " + r.rUrl
+    if len(r.rComment) != 0 {
+        result += "\nComment: " + r.rComment;
+    }
+    return result
+}
+
+func printRequest(request *http.Request, t string) {
+    rev := revil{rType:t, rUrl:request.FormValue("url"), rComment:request.FormValue("c")}
+
+    fmt.Println("Received", rev.rType, "revil!")
+    fmt.Println(getString(rev))
+    fmt.Println()
+}
+
+func linkHandler(w http.ResponseWriter, request *http.Request) {
+    if request.Method == "POST" {
+        printRequest(request, "link")
     }
 }
 
-func pageHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method == "POST" {
-        fmt.Println("Received page revil!");
-        fmt.Println("Url:", r.FormValue("url"));
-        fmt.Println("Comment:", r.FormValue("c"));
-        fmt.Println();
+func pageHandler(w http.ResponseWriter, request *http.Request) {
+    if request.Method == "POST" {
+        printRequest(request, "page")
     }
 }
 
-func imageHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-        fmt.Println("Received image revil!");
-        fmt.Println("Url:", r.FormValue("url"));
-        fmt.Println("Comment:", r.FormValue("c"));
-        fmt.Println();
+func imageHandler(w http.ResponseWriter, request *http.Request) {
+	if request.Method == "POST" {
+        printRequest(request, "image")
     }
 }
 
-func selectionHandler(w http.ResponseWriter, r *http.Request) {
-    if r.Method == "POST" {
-        fmt.Println("Received selection revil!");
-        fmt.Println("Url:", r.FormValue("url"));
-        fmt.Println("Comment:", r.FormValue("c"));
-        fmt.Println();
+func selectionHandler(w http.ResponseWriter, request *http.Request) {
+    if request.Method == "POST" {
+        printRequest(request, "selection")
     }
 }
 
