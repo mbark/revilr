@@ -1,29 +1,35 @@
-// Copyright (c) 2010 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-// A generic onclick callback function.
-function genericOnClick(info, tab) {
-  console.log("item " + info.menuItemId + " was clicked");
-  console.log("info: " + JSON.stringify(info));
-  console.log("tab: " + JSON.stringify(tab));
-  alert("Generic element-uru!");
+function allOnClick(info, tab) {
+  alert(JSON.stringify(info) + "\n\n\n" + JSON.stringify(tab));
 }
 
 function linkOnClick(info, tab) {
   alert(info.linkUrl);
 }
 
-// Create one test item for each context type.
-var contexts = ["page","selection","editable","image","video",
-                "audio"];
-for (var i = 0; i < contexts.length; i++) {
-  var context = contexts[i];
-  var title = "Revil " + context + " item";
-  var id = chrome.contextMenus.create({"title": title, "contexts":[context],
-                                       "onclick": genericOnClick});
-  console.log("'" + context + "' item:" + id);
+function pageOnClick(info, tab) {
+  alert(tab.title + "\n\n" + info.pageUrl);
 }
 
-var title = "Revil link";
-var id = chrome.contextMenus.create({"title": title, "contexts":["link"], "onclick":linkOnClick});
+function imageOnClick(info, tab) {
+  alert(info.srcUrl);
+}
+
+function selectionOnClick(info, tab) {
+  alert(info.pageUrl + "\n\n\"" + info.selectionText + "\"");
+}
+
+function createContextMenu() {
+var context = "link";
+chrome.contextMenus.create({"title": "Revil " + context + "!", "contexts":[context], "onclick":linkOnClick});
+
+var context = "page";
+chrome.contextMenus.create({"title": "Revil " + context + "!", "contexts":[context], "onclick":pageOnClick});
+
+var context = "image";
+chrome.contextMenus.create({"title": "Revil " + context + "!", "contexts":[context], "onclick":imageOnClick});
+
+var context = "selection";
+chrome.contextMenus.create({"title": "Revil " + context + "!", "contexts":[context], "onclick":selectionOnClick});
+}
+
+createContextMenu();
