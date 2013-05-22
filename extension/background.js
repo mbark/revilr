@@ -11,7 +11,7 @@ function pageOnClick(info, tab) {
 	var comment = tab.title;
 
 	var popup = 'revil.html#' + url;
-	chrome.windows.create({ url: popup, width: 450, height: 200 });
+	chrome.windows.create({ url: popup, width: 450, height: 220 });
 }
 
 function imageOnClick(info, tab) {
