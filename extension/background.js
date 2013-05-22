@@ -1,25 +1,36 @@
-function allOnClick(info, tab) {
-  alert(JSON.stringify(info) + "\n\n\n" + JSON.stringify(tab));
-}
-
 function linkOnClick(info, tab) {
-  alert(info.linkUrl);
+  	window.localStorage.setItem( 'type', 'link');
+	window.localStorage.setItem( 'url', info.linkUrl);
+
+	openPopup();
 }
 
 function pageOnClick(info, tab) {
-	var url = info.pageUrl;
-	var comment = tab.title;
+	window.localStorage.setItem( 'type', 'page');
+	window.localStorage.setItem( 'url', info.pageUrl);
+	window.localStorage.setItem( 'comment', tab.title);
 
-	var popup = 'revil.html#' + url;
-	chrome.windows.create({ url: popup, width: 450, height: 220 });
+	openPopup();
 }
 
 function imageOnClick(info, tab) {
-  alert(info.srcUrl);
+  	window.localStorage.setItem( 'type', 'image');
+	window.localStorage.setItem( 'url', info.srcUrl);
+
+	openPopup();
 }
 
 function selectionOnClick(info, tab) {
-  alert(info.pageUrl + "\n\n\"" + info.selectionText + "\"");
+	window.localStorage.setItem( 'type', 'selection');
+	window.localStorage.setItem( 'url', info.pageUrl);
+	window.localStorage.setItem( 'comment', info.selectionText);
+
+	openPopup();
+}
+
+function openPopup() {
+	var popup = 'revil.html';
+	chrome.windows.create({ url: popup, width: 450, height: 220 });
 }
 
 function createContextMenu() {
