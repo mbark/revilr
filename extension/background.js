@@ -7,7 +7,11 @@ function linkOnClick(info, tab) {
 }
 
 function pageOnClick(info, tab) {
-  alert(tab.title + "\n\n" + info.pageUrl);
+	var url = info.pageUrl;
+	var comment = tab.title;
+
+	var popup = 'revil.html#' + url;
+	chrome.windows.create({ url: popup, width: 450, height: 200 });
 }
 
 function imageOnClick(info, tab) {
