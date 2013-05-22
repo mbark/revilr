@@ -3,7 +3,19 @@ function renderText(url) {
 }
 
 function revilNow() {
-  alert("Sent:\n\n" + document.getElementById('urlField').value + "\n" + document.getElementById('commentField').value);
+	var http = new XMLHttpRequest();
+	var targetUrl = "http://127.0.0.1:8080/revilr/page";
+	var params = "url=" + document.getElementById('urlField').value + "&c=" + document.getElementById('commentField').value;
+	http.open("POST", targetUrl, true);
+	http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	http.setRequestHeader("Content-length", params.length);
+	http.setRequestHeader("Connection", "close");
+	http.onreadystatechange = function() {//Call a function when the state changes.
+		if(http.readyState == 4 && http.status == 200) {
+			alert("Sent succesfully!");
+		}
+	}
+	http.send(params);
 }
 
 

@@ -2,7 +2,10 @@
   "name": "Revilr",
   "description": "Minimalist link sharing for Chrome. Today.",
   "version": "0.1",
-  "permissions": ["contextMenus"],
+  "permissions": [
+  		"contextMenus",
+  		"http://127.0.0.1:8080/revilr/*"
+  	],
   "background": {
     "scripts": ["background.js"]
   },

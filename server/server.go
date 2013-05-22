@@ -6,23 +6,39 @@ import (
 )
 
 func linkHandler(w http.ResponseWriter, r *http.Request) {
-    values := r.URL.Query()
-    fmt.Println("Revild link",values["val"], "with comment", values["c"])
+    if r.Method == "POST" {
+        fmt.Println("Received link revil!");
+        fmt.Println("Url:", r.FormValue("url"));
+        fmt.Println("Comment:", r.FormValue("c"));
+        fmt.Println();
+    }
 }
 
 func pageHandler(w http.ResponseWriter, r *http.Request) {
-    values := r.URL.Query()
-    fmt.Println("Revild page",values["val"], "with comment", values["c"])
+    if r.Method == "POST" {
+        fmt.Println("Received page revil!");
+        fmt.Println("Url:", r.FormValue("url"));
+        fmt.Println("Comment:", r.FormValue("c"));
+        fmt.Println();
+    }
 }
 
 func imageHandler(w http.ResponseWriter, r *http.Request) {
-	values := r.URL.Query()
-    fmt.Println("Revild image",values["val"], "with comment", values["c"])
+	if r.Method == "POST" {
+        fmt.Println("Received image revil!");
+        fmt.Println("Url:", r.FormValue("url"));
+        fmt.Println("Comment:", r.FormValue("c"));
+        fmt.Println();
+    }
 }
 
 func selectionHandler(w http.ResponseWriter, r *http.Request) {
-    values := r.URL.Query()
-    fmt.Println("Revild selection",values["val"], "with comment", values["c"])
+    if r.Method == "POST" {
+        fmt.Println("Received selection revil!");
+        fmt.Println("Url:", r.FormValue("url"));
+        fmt.Println("Comment:", r.FormValue("c"));
+        fmt.Println();
+    }
 }
 
 func main() {
