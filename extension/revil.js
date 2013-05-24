@@ -4,7 +4,7 @@ function renderText(url, comment) {
 }
 
 function revilNow() {
-	var type = getAndDeleteFromStorage('type');
+	var type = getFromStorage('type');
 	var targetUrl = "http://127.0.0.1:8080/revilr/" + type;
 
 	var posting = $.post(targetUrl, {
@@ -12,26 +12,32 @@ function revilNow() {
 		c: document.getElementById('commentField').value
 	});
 	posting.done(function() {
-		alert("Reviled!");
+		alert("Revild " + getFromStorage('type') + "!");
 	});
 	posting.fail(function() {
 		alert("Failed to revil!");
 	});
 	posting.always(function() {
+		clearStorage();
 		window.close();
 	});
 }
 
-function getAndDeleteFromStorage(item) {
+function getFromStorage(item) {
 	var stored = window.localStorage.getItem(item);
-  	window.localStorage.removeItem(item);
   	return stored;
+}
+
+function clearStorage() {
+  	window.localStorage.removeItem('type');
+  	window.localStorage.removeItem('url');
+  	window.localStorage.removeItem('comment');
 }
 
 document.addEventListener("DOMContentLoaded", function () {
   	document.querySelector('button').addEventListener('click', revilNow);
 
-  	var url = getAndDeleteFromStorage('url');
-  	var comment = getAndDeleteFromStorage('comment');
+  	var url = getFromStorage('url');
+  	var comment = getFromStorage('comment');
   	renderText(url, comment);
 });
