@@ -18,9 +18,13 @@ function revilNow() {
 		alert("Failed to revil!");
 	});
 	posting.always(function() {
-		clearStorage();
-		window.close();
+		exit();
 	});
+}
+
+function exit() {
+	clearStorage();
+	window.close();
 }
 
 function getFromStorage(item) {
@@ -34,8 +38,9 @@ function clearStorage() {
   	window.localStorage.removeItem('comment');
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  	document.querySelector('button').addEventListener('click', revilNow);
+$(document).ready(function() {
+  	document.getElementById('buttonOk').addEventListener('click', revilNow);
+  	document.getElementById('buttonCancel').addEventListener('click', exit);
 
   	var url = getFromStorage('url');
   	var comment = getFromStorage('comment');

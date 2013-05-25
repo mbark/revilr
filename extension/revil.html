@@ -2,12 +2,17 @@
 <html
   <head>
     <link href="revil.css" rel="stylesheet" type="text/css"></link>
-    <script src="revil.js"></script>
     <script src="jquery-2.0.0.min.js"></script>
+    <script src="revil.js"></script>
   </head>
   <body>
-      Url: <input type="text" name="urlField" id="urlField"><br>
-      Comment: <input type="text" name="commentField" id="commentField"><br>
-      <button>Revil!</button>
+    <label for="urlField">Url:</label>
+    <input type="text" name="urlField" id="urlField"><br>
+    <label for="commentField">Comment:</label>
+    <input type="text" name="commentField" id="commentField"><br>
+    <div id="buttonContainer">
+      <button id="buttonOk">Revil!</button>
+      <button id="buttonCancel">Cancel</button>
+    </div>
   </body>
 </html>

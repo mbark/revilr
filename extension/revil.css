@@ -1,6 +1,15 @@
 body {
-	background-color:#636363;
+	background-color:#dddddd;
+	font-family: sans-serif;
+	font-size: 12px;
 }
 input {
 	width:100%;
+}
+button {
+	width:100px;
+}
+#buttonContainer {
+	width:100%;
+	text-align: right;
 }
