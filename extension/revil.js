@@ -39,6 +39,7 @@ function clearStorage() {
 }
 
 $(document).ready(function() {
+	document.getElementById('buttonOk').innerHTML = 'Revil ' + getFromStorage('type') + '!';
   	document.getElementById('buttonOk').addEventListener('click', revilNow);
   	document.getElementById('buttonCancel').addEventListener('click', exit);
 
