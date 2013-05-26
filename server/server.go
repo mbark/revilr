@@ -7,10 +7,11 @@ import (
 	"net/http"
 	"os"
 )
+
 var database *sql.DB
 
 func getRevil(request *http.Request, t string) revil {
-    return revil{Type:t, Url:request.FormValue("url"), Comment:request.FormValue("c")};
+	return revil{Type: t, Url: request.FormValue("url"), Comment: request.FormValue("c")}
 }
 
 func linkHandler(w http.ResponseWriter, request *http.Request) {
@@ -24,7 +25,7 @@ func linkHandler(w http.ResponseWriter, request *http.Request) {
 func pageHandler(w http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
 		rev := getRevil(request, "page")
-		rev.printRevil();
+		rev.printRevil()
 		insertIntoDatabase(rev)
 	}
 }
@@ -32,7 +33,7 @@ func pageHandler(w http.ResponseWriter, request *http.Request) {
 func imageHandler(w http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
 		rev := getRevil(request, "image")
-		rev.printRevil();
+		rev.printRevil()
 		insertIntoDatabase(rev)
 	}
 }
@@ -40,7 +41,7 @@ func imageHandler(w http.ResponseWriter, request *http.Request) {
 func selectionHandler(w http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
 		rev := getRevil(request, "selection")
-		rev.printRevil();
+		rev.printRevil()
 		insertIntoDatabase(rev)
 	}
 }
@@ -127,7 +128,7 @@ func main() {
 	database = db
 	defer database.Close()
 
-    //uncomment to verify it works
+	//uncomment to verify it works
 	//getAllValuesInDatabase()
 
 	http.HandleFunc("/revilr/link", linkHandler)
