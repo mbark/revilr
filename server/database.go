@@ -5,6 +5,7 @@ import (
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
+	"strconv"
 )
 
 var database *sql.DB
@@ -80,4 +81,19 @@ func getAllValuesInDatabase() {
 		rows.Scan(&url, &rtype, &comment)
 		revil{Type: rtype, Url: url, Comment: comment}.printRevil()
 	}
+}
+
+func getRevilInDatabase(row int) revil {
+	rows, err := database.Query("select url, type, comment from revil LIMIT 1 OFFSET " + strconv.Itoa(row))
+	if err != nil {
+		fmt.Println("Error:", err)
+		return *new(revil)
+	}
+	defer rows.Close()
+	rows.Next()
+	var url string
+	var rtype string
+	var comment string
+	rows.Scan(&url, &rtype, &comment)
+	return revil{Type: rtype, Url: url, Comment: comment}
 }
