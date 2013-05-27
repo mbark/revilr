@@ -78,6 +78,6 @@ func getAllValuesInDatabase() {
 		var rtype string
 		var comment string
 		rows.Scan(&url, &rtype, &comment)
-		revil{Type: rtype, Url: url, Comment: comment}.printRevil();
+		revil{Type: rtype, Url: url, Comment: comment}.printRevil()
 	}
 }

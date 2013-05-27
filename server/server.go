@@ -2,42 +2,33 @@ package main
 
 import (
 	"net/http"
+    "regexp"
 )
+
+const lenPath = len("/revilr/")
+var typeValidator = regexp.MustCompile("^(link|page|image|selection)$")
 
 func getRevil(request *http.Request, t string) revil {
 	return revil{Type: t, Url: request.FormValue("url"), Comment: request.FormValue("c")}
 }
 
-func linkHandler(w http.ResponseWriter, request *http.Request) {
-	if request.Method == "POST" {
-		rev := getRevil(request, "link")
-		rev.printRevil()
-		insertIntoDatabase(rev)
+func httpHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		postHandler(w, r)
+	} else if r.Method == "GET" {
+
 	}
 }
 
-func pageHandler(w http.ResponseWriter, request *http.Request) {
-	if request.Method == "POST" {
-		rev := getRevil(request, "page")
-		rev.printRevil()
-		insertIntoDatabase(rev)
+func postHandler(w http.ResponseWriter, r *http.Request) {
+	rType := r.URL.Path[lenPath:]
+	if !typeValidator.MatchString(rType) {
+		http.NotFound(w, r)
+		return
 	}
-}
-
-func imageHandler(w http.ResponseWriter, request *http.Request) {
-	if request.Method == "POST" {
-		rev := getRevil(request, "image")
-		rev.printRevil()
-		insertIntoDatabase(rev)
-	}
-}
-
-func selectionHandler(w http.ResponseWriter, request *http.Request) {
-	if request.Method == "POST" {
-		rev := getRevil(request, "selection")
-		rev.printRevil()
-		insertIntoDatabase(rev)
-	}
+	rev := getRevil(r, rType)
+	rev.printRevil()
+	insertIntoDatabase(rev)
 }
 
 func main() {
@@ -52,9 +43,6 @@ func main() {
 	//uncomment to verify it works
 	getAllValuesInDatabase()
 
-	http.HandleFunc("/revilr/link", linkHandler)
-	http.HandleFunc("/revilr/page", pageHandler)
-	http.HandleFunc("/revilr/image", imageHandler)
-	http.HandleFunc("/revilr/selection", selectionHandler)
+	http.HandleFunc("/revilr/", httpHandler)
 	http.ListenAndServe(":8080", nil)
 }
