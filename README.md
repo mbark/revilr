@@ -7,7 +7,7 @@ Setting up sqlite3 on Windows
 -----------------------------
 
 * [Add git to your Paths variable](http://blog.countableset.ch/2012/06/07/adding-git-to-windows-7-path/)
-* [Download TDM-GCC and install it](http://sourceforge.net/projects/mingw-w64/files/mingw-w64/mingw-w64-release/)
+* [Download TDM-GCC and install it](http://tdm-gcc.tdragon.net/)
 * Add the bin folder of your TDM-GCC installation
 * [Download SQLite3](http://mislav.uniqpath.com/rails/install-sqlite3/)
 
