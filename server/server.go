@@ -40,9 +40,9 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	rev := getRevilInDatabase(0)
+	rev := getAllRevilsInDatabase()
 
-	t, _ := template.ParseFiles("show.html")
+	t, _ := template.ParseFiles("showall.html")
 	t.Execute(w, rev)
 }
 
@@ -56,7 +56,7 @@ func main() {
 	defer database.Close()
 
 	//uncomment to verify it works
-	getAllValuesInDatabase()
+	printAllRevilsInDatabase()
 
 	http.HandleFunc("/revilr/", httpHandler)
 	http.ListenAndServe(":8080", nil)

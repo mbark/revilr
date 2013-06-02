@@ -1,0 +1,21 @@
+<html>
+
+<head>
+
+</head>
+
+<body>
+
+<h1>All revils in db:</h1>
+
+{{range .}}
+<div class="revil-container" style="border-style: solid; border-width: 1px;">
+<p class="Type">Type: {{.Type}} revil</p>
+
+<p class="Link">Link: <a href="{{.Url}}">{{.Url}}</a></p>
+
+<p class="Comment">Comment: {{.Comment}}</p>
+</div>
+{{end}}
+
+</body>
