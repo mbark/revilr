@@ -10,8 +10,9 @@ type revil struct {
 	Comment string
 }
 
-func (r revil) getString() string {
-	result := "Url: " + r.Url
+func (r revil) toString() string {
+	result := r.Type + " revil"
+	result += "\nUrl: " + r.Url
 	if len(r.Comment) != 0 {
 		result += "\nComment: " + r.Comment
 	}
@@ -20,8 +21,7 @@ func (r revil) getString() string {
 
 func (r revil) printRevil() {
 	fmt.Println("--------------")
-	fmt.Println(r.Type, "revil:")
-	fmt.Println(r.getString())
+	fmt.Println(r.toString())
 	fmt.Println("--------------")
 	fmt.Println()
 }
