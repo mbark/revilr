@@ -67,13 +67,14 @@ func insertIntoDatabase(rev revil) error {
 	return nil
 }
 
-func getAllValuesInDatabase() {
+func printAllRevilsInDatabase() {
 	rows, err := database.Query("select url, type, comment from revil")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 	defer rows.Close()
+
 	for rows.Next() {
 		var url string
 		var rtype string
@@ -83,6 +84,27 @@ func getAllValuesInDatabase() {
 	}
 }
 
+func getAllRevilsInDatabase() []revil {
+	rows, err := database.Query("select url, type, comment from revil")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return make([]revil, 0)
+	}
+	defer rows.Close()
+
+	revils := make([]revil, 1)
+
+	for rows.Next() {
+		var url string
+		var rtype string
+		var comment string
+		rows.Scan(&url, &rtype, &comment)
+		revils = append(revils, revil{Type: rtype, Url: url, Comment: comment})
+	}
+
+	return revils
+}
+
 func getRevilInDatabase(row int) revil {
 	rows, err := database.Query("select url, type, comment from revil LIMIT 1 OFFSET " + strconv.Itoa(row))
 	if err != nil {
@@ -90,6 +112,7 @@ func getRevilInDatabase(row int) revil {
 		return *new(revil)
 	}
 	defer rows.Close()
+
 	rows.Next()
 	var url string
 	var rtype string
