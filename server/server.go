@@ -42,7 +42,7 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	rev := getAllRevilsInDatabase()
 
-	t, _ := template.ParseFiles("showall.html")
+	t, _ := template.ParseFiles("templates/showall.html")
 	t.Execute(w, rev)
 }
 
@@ -59,5 +59,7 @@ func main() {
 	printAllRevilsInDatabase()
 
 	http.HandleFunc("/revilr/", httpHandler)
+	http.HandleFunc("/revilr", indexHandler)
+	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("templates/resources"))))
 	http.ListenAndServe(":8080", nil)
 }
