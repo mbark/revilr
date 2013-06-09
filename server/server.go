@@ -46,6 +46,10 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, rev)
 }
 
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "templates/index.html")
+}
+
 func main() {
 	db, err := getDatabase()
 	if err != nil {
