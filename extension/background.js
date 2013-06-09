@@ -30,7 +30,7 @@ function selectionOnClick(info, tab) {
 
 function openPopup() {
 	var popup = 'revil.html';
-	chrome.windows.create({ url: popup, width: 550, height: 210, type:"popup", focused:true });
+	chrome.windows.create({ url: popup, height: 280, type:"popup", focused:true });
 }
 
 function createContextMenu() {
