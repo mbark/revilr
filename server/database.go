@@ -98,7 +98,7 @@ func getAllRevilsInDatabase() []revil {
 func getRevilOfType(rtype string) []revil {
 	rows, err := database.Query("select url, type, comment from revil WHERE type=?", rtype)
 	if err != nil {
-		fmt.Println("Error ", err);
+		fmt.Println("Error ", err)
 		return make([]revil, 0)
 	}
 	defer rows.Close()
