@@ -85,7 +85,7 @@ func printAllRevilsInDatabase() {
 }
 
 func getAllRevilsInDatabase() []revil {
-	rows, err := database.Query("select url, type, comment from revil")
+	rows, err := database.Query("select url, type, comment from revil order by ROWID desc")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return make([]revil, 0)
