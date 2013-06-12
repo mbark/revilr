@@ -92,7 +92,23 @@ func getAllRevilsInDatabase() []revil {
 	}
 	defer rows.Close()
 
-	revils := make([]revil, 1)
+	return rowsToRevils(rows)
+}
+
+func getRevilOfType(rtype string) []revil {
+	rows, err := database.Query("select url, type, comment from revil WHERE type=?", rtype)
+	if err != nil {
+		fmt.Println("Error ", err);
+		return make([]revil, 0)
+	}
+	defer rows.Close()
+
+	revils := rowsToRevils(rows)
+	return revils
+}
+
+func rowsToRevils(rows *sql.Rows) []revil {
+	revils := make([]revil, 0)
 
 	for rows.Next() {
 		var url string

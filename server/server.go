@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 	"regexp"
+	"fmt"
 )
 
 const lenPath = len("/revilr/")
@@ -40,14 +41,24 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	rev := getAllRevilsInDatabase()
+	fmt.Println(rType)
+	rev := getRevilOfType(rType)
 
-	t, _ := template.ParseFiles("templates/showall.html")
+	htmlFile := "templates/" + rType + ".html"
+	t, err := template.ParseFiles(htmlFile)
+
+	if err != nil {
+		fmt.Println(err)
+		http.NotFound(w, r)
+	}
 	t.Execute(w, rev)
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "templates/index.html")
+	rev := getAllRevilsInDatabase()
+
+	t, _ := template.ParseFiles("templates/index.html")
+	t.Execute(w, rev)
 }
 
 func main() {
