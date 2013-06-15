@@ -8,7 +8,7 @@ type revil struct {
 	Type    string
 	Url     string
 	Comment string
-	Date 	string
+	Date    string
 }
 
 func (r revil) toString() string {

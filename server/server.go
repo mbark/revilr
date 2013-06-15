@@ -1,10 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"regexp"
-	"fmt"
 )
 
 const lenPath = len("/revilr/")
