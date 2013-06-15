@@ -3,7 +3,7 @@
 <head>
   <title>revilr index</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="resources/bootstrap.min.css" rel="stylesheet" media="screen">
+  <link href="resources/styles.css" rel="stylesheet" media="screen">
 </head>
 
 <body>
@@ -11,7 +11,6 @@
     <div class="navbar-inner">
       <a class="brand" href="/revilr">revilr</a>
       <ul class="nav">
-        <li><a href="revilr/link">Links</a></li>
         <li><a href="revilr/page">Pages</a></li>
         <li><a href="revilr/image">Images</a></li>
         <li><a href="revilr/selection">Selections</a></li>
@@ -19,17 +18,23 @@
     </div>
   </div>
 
-  <h1>All revils</h1>
+  <div id="main">
+
+    <h1>All</h1>
 
   {{range .}}
   <div class="well">
-    <p class="Type">Type: {{.Type}}</p>
+    <p class="reviltype">{{.Type}} revil</p>
 
-    <p class="Link">Link: <a href="{{.Url}}">{{.Url}}</a></p>
+    <p class="revilcomment">{{.Comment}}</p>
 
-    <p class="Comment">Comment: {{.Comment}}</p>
+    <p class="revillink"><a href="{{.Url}}">{{.Url}}</a></p>
+
+    <p class="revildate">{{.Date}}</p>
   </div>
   {{end}}
+
+</div>
 
   <script src="http://code.jquery.com/jquery.js"></script>
   <script src="../resources//bootstrap.min.js"></script>
