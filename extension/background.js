@@ -1,5 +1,5 @@
 function linkOnClick(info, tab) {
-  	window.localStorage.setItem( 'type', 'link');
+  	window.localStorage.setItem( 'type', 'page');
 	window.localStorage.setItem( 'url', info.linkUrl);
 
 	openPopup();
@@ -34,17 +34,13 @@ function openPopup() {
 }
 
 function createContextMenu() {
-var context = "link";
-chrome.contextMenus.create({"title": "Revil " + context + "!", "contexts":[context], "onclick":linkOnClick});
+chrome.contextMenus.create({"title": "Revil link!", "contexts":["link"], "onclick":linkOnClick});
 
-var context = "page";
-chrome.contextMenus.create({"title": "Revil " + context + "!", "contexts":[context], "onclick":pageOnClick});
+chrome.contextMenus.create({"title": "Revil this page!", "contexts":["page"], "onclick":pageOnClick});
 
-var context = "image";
-chrome.contextMenus.create({"title": "Revil " + context + "!", "contexts":[context], "onclick":imageOnClick});
+chrome.contextMenus.create({"title": "Revil image!", "contexts":["image"], "onclick":imageOnClick});
 
-var context = "selection";
-chrome.contextMenus.create({"title": "Revil " + context + "!", "contexts":[context], "onclick":selectionOnClick});
+chrome.contextMenus.create({"title": "Revil selection!", "contexts":["selection"], "onclick":selectionOnClick});
 }
 
 createContextMenu();

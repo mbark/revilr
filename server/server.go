@@ -9,8 +9,8 @@ import (
 
 const lenPath = len("/revilr/")
 
-var postTypeValidator = regexp.MustCompile("^(link|page|image|selection)$")
-var getTypeValidator = regexp.MustCompile("^(link|page|image|selection|)$")
+var postTypeValidator = regexp.MustCompile("^(page|image|selection)$")
+var getTypeValidator = regexp.MustCompile("^(page|image|selection|)$")
 
 func getRevil(request *http.Request, t string) revil {
 	return revil{Type: t, Url: request.FormValue("url"), Comment: request.FormValue("c")}
