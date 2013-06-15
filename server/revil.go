@@ -8,6 +8,7 @@ type revil struct {
 	Type    string
 	Url     string
 	Comment string
+	Date 	string
 }
 
 func (r revil) toString() string {
@@ -16,6 +17,7 @@ func (r revil) toString() string {
 	if len(r.Comment) != 0 {
 		result += "\nComment: " + r.Comment
 	}
+	result += "\nDate: " + r.Date
 	return result
 }
 

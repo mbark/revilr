@@ -41,7 +41,7 @@ func instantiateDatabase(dbPath string) (db *sql.DB, err error) {
 	}
 
 	sqls := []string{
-		"create table revil (url text not null primary key, type text, comment text)",
+		"CREATE TABLE revil (url TEXT NOT NULL, type TEXT, comment TEXT, date DATE DEFAULT (DATETIME('now','localtime')));",
 	}
 
 	for _, sql := range sqls {
@@ -68,7 +68,7 @@ func insertIntoDatabase(rev revil) error {
 }
 
 func printAllRevilsInDatabase() {
-	rows, err := database.Query("select url, type, comment from revil")
+	rows, err := database.Query("select url, type, comment, date from revil")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -76,16 +76,12 @@ func printAllRevilsInDatabase() {
 	defer rows.Close()
 
 	for rows.Next() {
-		var url string
-		var rtype string
-		var comment string
-		rows.Scan(&url, &rtype, &comment)
-		revil{Type: rtype, Url: url, Comment: comment}.printRevil()
+		rowToRevil(rows).printRevil()
 	}
 }
 
 func getAllRevilsInDatabase() []revil {
-	rows, err := database.Query("select url, type, comment from revil order by ROWID desc")
+	rows, err := database.Query("select url, type, comment, date from revil order by ROWID desc")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return make([]revil, 0)
@@ -96,7 +92,7 @@ func getAllRevilsInDatabase() []revil {
 }
 
 func getRevilOfType(rtype string) []revil {
-	rows, err := database.Query("select url, type, comment from revil WHERE type=?", rtype)
+	rows, err := database.Query("select url, type, comment, date from revil WHERE type=?", rtype)
 	if err != nil {
 		fmt.Println("Error ", err)
 		return make([]revil, 0)
@@ -111,14 +107,20 @@ func rowsToRevils(rows *sql.Rows) []revil {
 	revils := make([]revil, 0)
 
 	for rows.Next() {
-		var url string
-		var rtype string
-		var comment string
-		rows.Scan(&url, &rtype, &comment)
-		revils = append(revils, revil{Type: rtype, Url: url, Comment: comment})
+		revils = append(revils, rowToRevil(rows))
 	}
 
 	return revils
+}
+
+func rowToRevil(row *sql.Rows) revil {
+	var url string
+	var rtype string
+	var comment string
+	var date string
+	row.Scan(&url, &rtype, &comment, &date)
+	//fmt.Println(url, rtype, comment, date)
+	return revil{Type: rtype, Url: url, Comment: comment, Date: date}
 }
 
 func getRevilInDatabase(row int) revil {
@@ -130,9 +132,5 @@ func getRevilInDatabase(row int) revil {
 	defer rows.Close()
 
 	rows.Next()
-	var url string
-	var rtype string
-	var comment string
-	rows.Scan(&url, &rtype, &comment)
-	return revil{Type: rtype, Url: url, Comment: comment}
+	return rowToRevil(rows)
 }
