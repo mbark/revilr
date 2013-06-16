@@ -11,22 +11,22 @@
 	text-align: left;
 }
 
-.reviltype {
+.revil-type {
 	font-size: 16px;
 	font-weight: bold;
 	width: 100%;
 	text-align: center;
 }
 
-.revilcomment {
+.revil-comment {
 	font-size: 15px;
 }
 
-.revillink {
+.revil-link {
 
 }
 
-.revildate {
+.revil-date {
 	float: right;
 	font-size: 10px;
 }
