@@ -4,16 +4,13 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"net/url"
 	"regexp"
 )
 
 const lenPath = len("/revilr/")
 
 var validTypes = regexp.MustCompile("^(page|image|selection)$")
-
-func getRevil(request *http.Request, t string) revil {
-	return revil{Type: t, Url: request.FormValue("url"), Comment: request.FormValue("c")}
-}
 
 func main() {
 	db, err := getDatabase()
@@ -49,9 +46,12 @@ func parseType(request *http.Request) string {
 }
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
-	rev := getAllRevilsInDatabase()
+	revils := getAllRevilsInDatabase()
+	for key,rev := range revils {
+		revils[key].DisplayUrl = parseUrl(rev)
+	}
 	t, _ := template.ParseFiles("templates/index.html")
-	t.Execute(writer, rev)
+	t.Execute(writer, revils)
 }
 
 func postHandler(request *http.Request, revilType string) {
@@ -60,8 +60,16 @@ func postHandler(request *http.Request, revilType string) {
 	insertIntoDatabase(rev)
 }
 
+func getRevil(request *http.Request, t string) revil {
+	return revil{Type: t, Url: request.FormValue("url"), Comment: request.FormValue("c")}
+}
+
+
 func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
-	rev := getRevilOfType(revilType)
+	revils := getRevilsOfType(revilType)
+	for key,rev := range revils {
+		revils[key].DisplayUrl = parseUrl(rev)
+	}
 
 	htmlFile := "templates/" + revilType + ".html"
 	t, err := template.ParseFiles(htmlFile)
@@ -70,5 +78,16 @@ func getHandler(writer http.ResponseWriter, request *http.Request, revilType str
 		fmt.Println(err)
 		http.NotFound(writer, request)
 	}
-	t.Execute(writer, rev)
+	t.Execute(writer, revils)
+}
+
+func parseUrl(rev revil) string {
+	parsed, err := url.Parse(rev.Url)
+	if err != nil {
+		fmt.Println(err)
+		return rev.Url
+	}
+	fmt.Println(parsed.Host)
+
+	return parsed.Host
 }

@@ -5,10 +5,11 @@ import (
 )
 
 type revil struct {
-	Type    string
-	Url     string
-	Comment string
-	Date    string
+	Type       string
+	Url        string
+	DisplayUrl string
+	Comment    string
+	Date       string
 }
 
 func (r revil) toString() string {

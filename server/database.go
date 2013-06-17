@@ -13,7 +13,6 @@ var database *sql.DB
 func getDatabase() (db *sql.DB, err error) {
 	dbPath := "./revils.db"
 
-	//check if file exists
 	if exists, _ := fileExists(dbPath); exists {
 		db, err = sql.Open("sqlite3", "./"+dbPath)
 	} else {
@@ -91,7 +90,7 @@ func getAllRevilsInDatabase() []revil {
 	return rowsToRevils(rows)
 }
 
-func getRevilOfType(rtype string) []revil {
+func getRevilsOfType(rtype string) []revil {
 	rows, err := database.Query("select url, type, comment, date from revil WHERE type=?", rtype)
 	if err != nil {
 		fmt.Println("Error ", err)
@@ -119,7 +118,6 @@ func rowToRevil(row *sql.Rows) revil {
 	var comment string
 	var date string
 	row.Scan(&url, &rtype, &comment, &date)
-	//fmt.Println(url, rtype, comment, date)
 	return revil{Type: rtype, Url: url, Comment: comment, Date: date}
 }
 
