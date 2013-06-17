@@ -47,7 +47,7 @@ func parseType(request *http.Request) string {
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	revils := getAllRevilsInDatabase()
-	for key,rev := range revils {
+	for key, rev := range revils {
 		revils[key].DisplayUrl = parseUrl(rev)
 	}
 	t, _ := template.ParseFiles("templates/index.html")
@@ -64,10 +64,9 @@ func getRevil(request *http.Request, t string) revil {
 	return revil{Type: t, Url: request.FormValue("url"), Comment: request.FormValue("c")}
 }
 
-
 func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
 	revils := getRevilsOfType(revilType)
-	for key,rev := range revils {
+	for key, rev := range revils {
 		revils[key].DisplayUrl = parseUrl(rev)
 	}
 
