@@ -38,15 +38,8 @@ func getListOfRevilMaps(revils []revil) []map[string]interface{} {
 }
 
 func getMapForRevil(rev revil) map[string]interface{} {
-	data := make(map[string]interface{})
-
-	data["url"] = rev.Url
-	data["comment"] = rev.Comment
-	data["date"] = rev.Date
-	data["display-url"] = parseUrl(rev)
-
 	dataType := make(map[string]interface{})
-	dataType[rev.Type] = data
+	dataType[rev.Type] = rev.asMap()
 
 	return dataType
 }

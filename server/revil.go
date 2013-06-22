@@ -26,3 +26,14 @@ func (r revil) toString() string {
 func (r revil) printRevil() {
 	fmt.Println(r.toString())
 }
+
+func (rev revil) asMap() map[string]interface{} {
+	data := make(map[string]interface{})
+
+	data["url"] = rev.Url
+	data["comment"] = rev.Comment
+	data["date"] = rev.Date
+	data["display-url"] = parseUrl(rev)
+
+	return data
+}
