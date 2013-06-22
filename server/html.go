@@ -9,16 +9,18 @@ import (
 
 var index = "templates/index.html"
 var layout = "templates/layout.html"
+var navbar = "templates/navbar.html"
 
 func printAllRevils(revils []revil, writer http.ResponseWriter) {
 	data := formatRevilsForOutput(revils)
+	data["navbar"] = getNavbar()
 	html := mustache.RenderFileInLayout(index, layout, data)
 	fmt.Fprintf(writer, html)
 }
 
 func printAllRevilsOfType(revils []revil, revilType string, writer http.ResponseWriter) {
 	data := formatRevilsForOutput(revils)
-	data[revilType] = true
+	data["navbar"] = getNavbarForType(revilType)
 
 	htmlFile := "templates/" + revilType + ".html"
 	html := mustache.RenderFileInLayout(htmlFile, layout, data)
@@ -61,4 +63,19 @@ func parseUrl(rev revil) string {
 	}
 
 	return parsed.Host
+}
+
+func getNavbar() string {
+	data := make(map[string]interface{})
+	html := mustache.RenderFile(navbar, data)
+
+	return html
+}
+
+func getNavbarForType(revilType string) string {
+	data := make(map[string]interface{})
+	data[revilType] = true
+	html := mustache.RenderFile(navbar, data)
+
+	return html
 }
