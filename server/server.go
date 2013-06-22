@@ -54,10 +54,10 @@ func getRevil(request *http.Request, t string) revil {
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	revils := getAllRevilsInDatabase()
-	printAllRevils(revils, writer)
+	printAllRevils(revils, "all", writer)
 }
 
 func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
 	revils := getRevilsOfType(revilType)
-	printAllRevilsOfType(revils, revilType, writer)
+	printAllRevils(revils, revilType, writer)
 }
