@@ -4,15 +4,28 @@
   <h1>All</h1>
 
   {{#revils}}
+  {{#image}}
   <div class="well">
-    <p class="revil-type">{{type}}</p>
-
     <p class="revil-comment">{{comment}}</p>
-
+    <img class="revil-img" src="{{url}}"></img>
     <p class="revil-link"><a href="{{url}}">{{display-url}}</a></p>
-
     <p class="revil-date">{{date}}</p>
   </div>
+  {{/image}}
+  {{#page}}
+  <div class="well">
+    <p class="revil-comment">{{comment}}</p>
+    <p class="revil-link"><a href="{{url}}">{{display-url}}</a></p>
+    <p class="revil-date">{{date}}</p>
+  </div>
+  {{/page}}
+  {{#selection}}
+  <div class="well">
+    <blockquote class="revil-comment">{{comment}}</blockquote>
+    <p class="revil-link"><a href="{{url}}">{{display-url}}</a></p>
+    <p class="revil-date">{{date}}</p>
+  </div>
+  {{/selection}}
   {{/revils}}
 
 </div>

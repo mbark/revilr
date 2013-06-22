@@ -1,19 +1,17 @@
 {{{navbar}}}
-
 <div id="main">
 
   <h1>Images</h1>
 
   {{#revils}}
+  {{#image}}
   <div class="well">
     <p class="revil-comment">{{comment}}</p>
-
     <img class="revil-img" src="{{url}}"></img>
-
     <p class="revil-link"><a href="{{url}}">{{display-url}}</a></p>
-
     <p class="revil-date">{{date}}</p>
   </div>
+  {{/image}}
   {{/revils}}
 
 </div>

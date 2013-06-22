@@ -4,13 +4,13 @@
   <h1>Selections</h1>
 
   {{#revils}}
+  {{#selection}}
   <div class="well">
     <blockquote class="revil-comment">{{comment}}</blockquote>
-
     <p class="revil-link"><a href="{{url}}">{{display-url}}</a></p>
-
     <p class="revil-date">{{date}}</p>
   </div>
+  {{/selection}}
   {{/revils}}
 
 </div>
