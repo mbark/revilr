@@ -67,7 +67,7 @@ func insertIntoDatabase(rev revil) error {
 }
 
 func printAllRevilsInDatabase() {
-	rows, err := database.Query("select url, type, comment, date from revil")
+	rows, err := database.Query("SELECT url, type, comment, date FROM revil")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
@@ -80,7 +80,7 @@ func printAllRevilsInDatabase() {
 }
 
 func getAllRevilsInDatabase() []revil {
-	rows, err := database.Query("select url, type, comment, date from revil order by ROWID desc")
+	rows, err := database.Query("SELECT url, type, comment, date FROM revil ORDER BY ROWID DESC")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return make([]revil, 0)
@@ -91,7 +91,7 @@ func getAllRevilsInDatabase() []revil {
 }
 
 func getRevilsOfType(rtype string) []revil {
-	rows, err := database.Query("select url, type, comment, date from revil WHERE type=?", rtype)
+	rows, err := database.Query("SELECT url, type, comment, date FROM revil WHERE type=? ORDER BY ROWID DESC", rtype)
 	if err != nil {
 		fmt.Println("Error ", err)
 		return make([]revil, 0)
