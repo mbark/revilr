@@ -2,20 +2,22 @@ package main
 
 import (
 	"fmt"
+	"github.com/hoisie/mustache"
 	"net/http"
 	"net/url"
-	"github.com/hoisie/mustache"
 )
+
+var layout = "templates/layout.html"
 
 func printAllRevils(revils []revil, htmlFile string, writer http.ResponseWriter) {
 	data := formatRevilsForOutput(revils)
-	html := mustache.RenderFile(htmlFile, data)
+	html := mustache.RenderFileInLayout(htmlFile, layout, data)
 	fmt.Fprintf(writer, html)
 }
 
 func formatRevilsForOutput(revils []revil) map[string]interface{} {
 	values := make(map[string]interface{})
-		
+
 	values["revils"] = getListOfRevilMaps(revils)
 
 	return values
@@ -39,7 +41,7 @@ func getMapForRevil(rev revil) map[string]interface{} {
 	values["comment"] = rev.Comment
 	values["date"] = rev.Date
 	values["display-url"] = parseUrl(rev)
-	
+
 	return values
 }
 
