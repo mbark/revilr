@@ -22,17 +22,17 @@
 
     <h1>Images</h1>
 
-  {{range .}}
+  {{#revils}}
   <div class="well">
-    <p class="revil-comment">{{.Comment}}</p>
+    <p class="revil-comment">{{comment}}</p>
 
-    <img class="revil-img" src="{{.Url}}"></img>
+    <img class="revil-img" src="{{url}}"></img>
 
-    <p class="revil-link"><a href="{{.Url}}">{{.DisplayUrl}}</a></p>
+    <p class="revil-link"><a href="{{url}}">{{display-url}}</a></p>
 
-    <p class="revil-date">{{.Date}}</p>
+    <p class="revil-date">{{date}}</p>
   </div>
-  {{end}}
+  {{/revils}}
 
 </div>
 

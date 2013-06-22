@@ -7,7 +7,6 @@ import (
 type revil struct {
 	Type       string
 	Url        string
-	DisplayUrl string
 	Comment    string
 	Date       string
 }

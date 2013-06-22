@@ -22,17 +22,17 @@
 
     <h1>All</h1>
 
-  {{range .}}
+  {{#revils}}
   <div class="well">
-    <p class="revil-type">{{.Type}} revil</p>
+    <p class="revil-type">{{type}}</p>
 
-    <p class="revil-comment">{{.Comment}}</p>
+    <p class="revil-comment">{{comment}}</p>
 
-    <p class="revil-link"><a href="{{.Url}}">{{.DisplayUrl}}</a></p>
+    <p class="revil-link"><a href="{{url}}">{{display-url}}</a></p>
 
-    <p class="revil-date">{{.Date}}</p>
+    <p class="revil-date">{{date}}</p>
   </div>
-  {{end}}
+  {{/revils}}
 
 </div>
 

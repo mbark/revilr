@@ -22,15 +22,15 @@
 
     <h1>Selections</h1>
 
-  {{range .}}
+  {{#revils}}
   <div class="well">
-    <blockquote class="revil-comment">{{.Comment}}</blockquote>
+    <blockquote class="revil-comment">{{comment}}</blockquote>
 
-    <p class="revil-link"><a href="{{.Url}}">{{.DisplayUrl}}</a></p>
+    <p class="revil-link"><a href="{{url}}">{{display-url}}</a></p>
 
-    <p class="revil-date">{{.Date}}</p>
+    <p class="revil-date">{{date}}</p>
   </div>
-  {{end}}
+  {{/revils}}
 
 </div>
 
