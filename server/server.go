@@ -54,12 +54,10 @@ func getRevil(request *http.Request, t string) revil {
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	revils := getAllRevilsInDatabase()
-	htmlFile := "templates/index.html"
-	printAllRevils(revils, htmlFile, writer)
+	printAllRevils(revils, writer)
 }
 
 func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
 	revils := getRevilsOfType(revilType)
-	htmlFile := "templates/" + revilType + ".html"
-	printAllRevils(revils, htmlFile, writer)
+	printAllRevilsOfType(revils, revilType, writer)
 }
