@@ -12,18 +12,17 @@ type revil struct {
 }
 
 func (r revil) toString() string {
-	result := r.Type + " revil"
-	result += "\nUrl: " + r.Url
-	if len(r.Comment) != 0 {
-		result += "\nComment: " + r.Comment
-	}
-	result += "\nDate: " + r.Date
+	var result string
+
+	result += "{"
+	result += " type: " + r.Type
+	result += ", url: " + r.Url
+	result += ", comment: \"" + r.Comment + "\""
+	result += " }"
+
 	return result
 }
 
 func (r revil) printRevil() {
-	fmt.Println("--------------")
 	fmt.Println(r.toString())
-	fmt.Println("--------------")
-	fmt.Println()
 }
