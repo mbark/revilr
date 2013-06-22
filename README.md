@@ -20,3 +20,9 @@ Here TDM-GCC is installed at MinGW64.
 Finally run
 
 	go get github.com/mattn/go-sqlite3
+
+Additional downloads needed
+---------------------------
+
+[Mustache](https://github.com/hoisie/mustache)
+	go get github.com/hoisie/mustache
