@@ -1,5 +1,15 @@
 @import "bootstrap.min.css";
 
+body {
+	background: #333;
+
+	color: white;
+}
+
+a {
+	color: black !important;
+}
+
 #main {
 	text-align: center;
 	margin-left: auto;
@@ -8,34 +18,69 @@
 }
 
 .well {
+	border-width: 0px 0px 0px 3px;
 	text-align: left;
+	color: #333;
+	margin: 30px 0px 30px 0px;
+}
+
+.well.image-revil {
+	border-color: #BF9330;
+}
+
+.well.page-revil {
+	border-color: #3AA6D0;
+}
+
+.well.selection-revil {
+	border-color: #BF4330;
 }
 
 .revil-type {
-	font-size: 16px;
-	font-weight: bold;
-	width: 100%;
+	margin-top: -19px;
+	color: white;
+	float: right;
+	font-size: 14px;
+	font-weight: normal;
+	width: 80px;
 	text-align: center;
 }
 
+.image-revil .revil-type {
+	background: #BF9330;
+}
+.page-revil .revil-type {
+	background: #3AA6D0;
+}
+.selection-revil .revil-type {
+	background: #BF4330;
+}
+
+
 .revil-comment {
-	font-size: 15px;
+	font-size: 22px;
+}
+
+.revil-img {
+
 }
 
 .revil-link {
-
+	margin: 10px 5px -8px 0px;
+	font-size: 25px;
+	text-align: center;
 }
 
 .revil-date {
 	float: right;
-	font-size: 10px;
+	font-size: 11px;
 }
 
 blockquote {
 	background:#f9f9f9;
 	border-left:10px solid #ccc;
-	margin:1.5em 10px;
-	padding:.5em 10px;
+	margin: 10px 10px;
+	padding: .5em 10px;
 	quotes:"\201C""\201D""\2018""\2019";
 	font-style: italic;
 }
@@ -49,4 +94,5 @@ blockquote:before {
 }
 blockquote p {
 	display:inline;
+	font-size: 17px;
 }

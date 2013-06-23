@@ -1,7 +1,7 @@
+@import "resources/bootstrap.min.css";
+
 body {
-	background-color: #dddddd;
-	font-family: sans-serif;
-	font-size: 12px;
+	padding: 10px;
 }
 
 textarea:focus, input:focus{
@@ -9,23 +9,25 @@ textarea:focus, input:focus{
 }
 
 label {
-	margin: 4px;
+	font-size: 20px;
+	margin: 5px;
 }
 
 input {
+	margin: 5px;
 	width: 95%;
-	border: 1px solid #999999;
-	padding: 5px;
-	margin: 7px;
 }
 
 button {
-	background-color: #e8e8e8;
-	border: 1px solid #777777;
-	color: black;
 	width: 130px;
-	margin: 10px;
-	padding: 5px;
+}
+
+.btn-group {
+	margin-top: 10px;
+	width:100%;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 #buttonContainer {

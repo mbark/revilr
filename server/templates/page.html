@@ -1,13 +1,12 @@
 {{{navbar}}}
 <div id="main">
 
-  <h1>Pages</h1>
-
   {{#revils}}
   {{#page}}
-  <div class="well">
+  <div class="well page-revil">
+    <div class="revil-type">{{type}}</div>
     <p class="revil-comment">{{comment}}</p>
-    <p class="revil-link"><a href="{{url}}">{{display-url}}</a></p>
+    <p class="revil-link"><a title="{{url}}" href="{{url}}">@{{display-url}}</a></p>
     <p class="revil-date">{{date}}</p>
   </div>
   {{/page}}

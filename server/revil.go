@@ -34,6 +34,7 @@ func (rev revil) asMap() map[string]interface{} {
 	data["comment"] = rev.Comment
 	data["date"] = rev.Date
 	data["display-url"] = parseUrl(rev)
+	data["type"] = rev.Type
 
 	return data
 }
