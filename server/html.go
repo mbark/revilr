@@ -7,15 +7,22 @@ import (
 	"net/url"
 )
 
-var layout = "templates/layout.html"
-var navbar = "templates/navbar.html"
+var layout = parseFile("templates/layout.html")
+var navbar = parseFile("templates/navbar.html")
+var display = parseFile("templates/display.html")
+
+func parseFile(file string) *mustache.Template {
+	tmpl, err := mustache.ParseFile(file)
+	if err != nil {
+		panic(err)
+	}
+	return tmpl
+}
 
 func printAllRevils(revils []revil, revilType string, writer http.ResponseWriter) {
 	data := formatRevilsForOutput(revils, revilType)
 	data["navbar"] = getNavbar(revilType)
-
-	htmlFile := "templates/" + revilType + ".html"
-	html := mustache.RenderFileInLayout(htmlFile, layout, data)
+	html := display.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
 }
@@ -57,7 +64,7 @@ func parseUrl(rev revil) string {
 func getNavbar(revilType string) string {
 	data := make(map[string]interface{})
 	data[revilType] = true
-	html := mustache.RenderFile(navbar, data)
+	html := navbar.Render(data)
 
 	return html
 }
