@@ -10,6 +10,43 @@ a {
 	color: black !important;
 }
 
+.navbar-inner {
+	background: #F5F5F5 !important;
+	border-radius: 0px;
+	border: none;
+}
+
+.brand {
+	border-top: 4px solid #F5F5F5;
+	border-bottom: 4px solid #F5F5F5;
+}
+
+li a {
+	border-top: 4px solid #F5F5F5;
+	font-size: 16px;
+	border-bottom: 4px solid #F5F5F5;
+}
+
+li.active a {
+	background: #333 !important;
+	color: #F5F5F5 !important;
+	text-shadow: none !important;
+	box-shadow: none !important;
+	border-bottom: 4px solid #333;
+}
+
+li.page.active a {
+	border-top: 4px solid #3AA6D0;
+}
+
+li.image.active a {
+	border-top: 4px solid #BF9330;
+}
+
+li.selection.active a {
+	border-top: 4px solid #BF4330;
+}
+
 #main {
 	text-align: center;
 	margin-left: auto;
