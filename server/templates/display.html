@@ -1,34 +1,23 @@
 {{{navbar}}}
 
-<div id="main">
-
-
-  {{#revils}}
-  {{#image}}
+<div id="main">{{#revils}}{{#image}}
   <div class="well image-revil">
     <div class="revil-type">{{type}}</div>
     <p class="revil-comment">{{comment}}</p>
     <a href="{{url}}"><img class="revil-img" src="{{url}}"></img></a>
     <p class="revil-link"><a title="{{url}}" href="{{url}}">@{{display-url}}</a></p>
     <p class="revil-date">{{date}}</p>
-  </div>
-  {{/image}}
-  {{#page}}
+  </div>{{/image}}{{#page}}
   <div class="well page-revil">
     <div class="revil-type">{{type}}</div>
     <p class="revil-comment">{{comment}}</p>
     <p class="revil-link"><a title="{{url}}" href="{{url}}">@{{display-url}}</a></p>
     <p class="revil-date">{{date}}</p>
-  </div>
-  {{/page}}
-  {{#selection}}
+  </div>{{/page}}{{#selection}}
   <div class="well selection-revil">
     <div class="revil-type">{{type}}</div>
     <blockquote class="revil-comment"><p>{{comment}}</p></blockquote>
     <p class="revil-link"><a title="{{url}}" href="{{url}}">@{{display-url}}</a></p>
     <p class="revil-date">{{date}}</p>
-  </div>
-  {{/selection}}
-  {{/revils}}
-
+  </div>{{/selection}}{{/revils}}
 </div>

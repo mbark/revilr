@@ -19,7 +19,7 @@ func parseFile(file string) *mustache.Template {
 	return tmpl
 }
 
-func printAllRevils(revils []revil, revilType string, writer http.ResponseWriter) {
+func displayRevils(revils []revil, revilType string, writer http.ResponseWriter) {
 	data := formatRevilsForOutput(revils, revilType)
 	data["navbar"] = getNavbar(revilType)
 	html := display.RenderInLayout(layout, data)
