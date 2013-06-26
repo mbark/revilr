@@ -1,7 +1,21 @@
 @import "resources/bootstrap.min.css";
 
 body {
+	background: #333;
+	color: #F5F5F5;
 	padding: 10px;
+}
+
+#revil-type {
+	margin-top: -10px;
+	background-color: red;
+	color: white;
+	float: right;
+	font-size: 14px;
+	font-weight: normal;
+	width: 80px;
+	text-align: center;
+	border-radius: 0px 0px 4px 4px;
 }
 
 textarea:focus, input:focus{
@@ -14,6 +28,7 @@ label {
 }
 
 input {
+	color: #333 !important;
 	margin: 5px;
 	width: 95%;
 }
