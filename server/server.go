@@ -61,9 +61,19 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
-	username, _ := parseUser(request)
+	username, password := parseUser(request)
 	user, err := getUser(username)
-	fmt.Println(user, err)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if user.Username == "" {
+		createUser(username, password)
+		fmt.Println("Made user", username, "with password", password)
+	} else {
+		fmt.Println("Found matching user", user)
+	}
 }
 
 func parseUser(request *http.Request) (username, password string) {

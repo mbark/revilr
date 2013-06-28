@@ -152,3 +152,16 @@ func rowToUser(row *sql.Rows) *User {
 	row.Scan(&username, &password)
 	return &User{Username: username, Password: password}
 }
+
+func createUser(username, password string) error {
+	stmt, err := database.Prepare("insert into user(username, password) values(?, ?)")
+	if err != nil {
+		return err
+	}
+	stmt.Exec()
+	_, err = stmt.Exec(username, password)
+	if err != nil {
+		return err
+	}
+	return nil
+}
