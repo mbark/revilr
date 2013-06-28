@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"regexp"
+	"fmt"
 )
 
 const lenPath = len("/revilr/")
@@ -20,6 +21,7 @@ func main() {
 
 	http.HandleFunc("/revilr/", httpHandler)
 	http.HandleFunc("/revilr", indexHandler)
+	http.HandleFunc("/user", userHandler)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("templates/resources"))))
 	http.ListenAndServe(":8080", nil)
 }
@@ -43,13 +45,14 @@ func parseType(request *http.Request) string {
 }
 
 func postHandler(request *http.Request, revilType string) {
-	rev := getRevil(request, revilType)
+	rev := revil{Type: revilType, Url: request.FormValue("url"), Comment: request.FormValue("c")}
 	rev.printRevil()
 	insertIntoDatabase(rev)
 }
 
-func getRevil(request *http.Request, t string) revil {
-	return revil{Type: t, Url: request.FormValue("url"), Comment: request.FormValue("c")}
+func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
+	revils := getRevilsOfType(revilType)
+	displayRevils(revils, revilType, writer)
 }
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
@@ -57,7 +60,14 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	displayRevils(revils, "all", writer)
 }
 
-func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
-	revils := getRevilsOfType(revilType)
-	displayRevils(revils, revilType, writer)
+func userHandler(writer http.ResponseWriter, request *http.Request) {
+	username, _ := parseUser(request)
+	user, err := getUser(username)
+	fmt.Println(user, err)
+}
+
+func parseUser(request *http.Request) (username, password string) {
+	username = request.FormValue("user")
+	password = request.FormValue("password")
+	return
 }

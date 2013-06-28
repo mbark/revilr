@@ -10,8 +10,9 @@ Setting up sqlite3 on Windows
 * [Download TDM-GCC and install it](http://tdm-gcc.tdragon.net/)
 * Add the bin folder of your TDM-GCC installation
 * [Download SQLite3](http://mislav.uniqpath.com/rails/install-sqlite3/)
+* [Download HG, to be able to get all go package](http://tortoisehg.bitbucket.org/download/index.html)
 
-Your Path should now contain the following:
+Your Path should now contain the following, if not add as appropriate:
 
 	C:\Go\go\bin;C:\Program Files (x86)\Git\bin;C:\Program Files (x86)\Git\cmd;C:\MinGW64\bin
 

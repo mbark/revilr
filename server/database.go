@@ -41,6 +41,7 @@ func instantiateDatabase(dbPath string) (db *sql.DB, err error) {
 
 	sqls := []string{
 		"CREATE TABLE revil (url TEXT NOT NULL, type TEXT, comment TEXT, date DATE DEFAULT (DATETIME('now','localtime')));",
+		"CREATE TABLE user (username TEXT NOT NULL, password TEXT NOT NULL);",
 	}
 
 	for _, sql := range sqls {
@@ -112,15 +113,6 @@ func rowsToRevils(rows *sql.Rows) []revil {
 	return revils
 }
 
-func rowToRevil(row *sql.Rows) revil {
-	var url string
-	var rtype string
-	var comment string
-	var date string
-	row.Scan(&url, &rtype, &comment, &date)
-	return revil{Type: rtype, Url: url, Comment: comment, Date: date}
-}
-
 func getRevilInDatabase(row int) revil {
 	rows, err := database.Query("select url, type, comment from revil LIMIT 1 OFFSET " + strconv.Itoa(row))
 	if err != nil {
@@ -131,4 +123,32 @@ func getRevilInDatabase(row int) revil {
 
 	rows.Next()
 	return rowToRevil(rows)
+}
+
+func rowToRevil(row *sql.Rows) revil {
+	var url string
+	var rtype string
+	var comment string
+	var date string
+	row.Scan(&url, &rtype, &comment, &date)
+	return revil{Type: rtype, Url: url, Comment: comment, Date: date}
+}
+
+func getUser(username string) (user *User, err error) {
+	rows, err := database.Query("select username, password from user WHERE username=?", username)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	rows.Next()
+	user = rowToUser(rows)
+	return
+}
+
+func rowToUser(row *sql.Rows) *User {
+	var username string
+	var password []byte
+	row.Scan(&username, &password)
+	return &User{Username: username, Password: password}
 }
