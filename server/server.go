@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"regexp"
-	"fmt"
 )
 
 const lenPath = len("/revilr/")
@@ -69,10 +69,15 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	if user.Username == "" {
-		createUser(username, password)
+		user = &User{Username: username}
+		user.SetPassword(password)
+
+		createUser(user)
 		fmt.Println("Made user", username, "with password", password)
 	} else {
-		fmt.Println("Found matching user", user)
+		fmt.Println("Found matching user", user.Username)
+		matched := Login(user, password)
+		fmt.Println("Could login in =", matched)
 	}
 }
 

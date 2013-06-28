@@ -9,27 +9,16 @@ type User struct {
 	Password []byte
 }
 
-
 func (u *User) SetPassword(password string) {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		// you're in deep shit, son.
 		panic(err)
 	}
-	u.Password = hashedPass;
+	u.Password = hashedPass
 }
 
-func Login(username, password string) (user *User, err error) {
-	user, err = getUser(username)
-
-	if err != nil {
-		user = nil
-		return
-	}
-
-	err = bcrypt.CompareHashAndPassword(user.Password, []byte(password))
-	if err != nil {
-		user = nil
-	}
-	return
+func Login(user *User, password string) bool {
+	err := bcrypt.CompareHashAndPassword(user.Password, []byte(password))
+	return (err == nil)
 }

@@ -153,13 +153,13 @@ func rowToUser(row *sql.Rows) *User {
 	return &User{Username: username, Password: password}
 }
 
-func createUser(username, password string) error {
+func createUser(user *User) error {
 	stmt, err := database.Prepare("insert into user(username, password) values(?, ?)")
 	if err != nil {
 		return err
 	}
 	stmt.Exec()
-	_, err = stmt.Exec(username, password)
+	_, err = stmt.Exec(user.Username, user.Password)
 	if err != nil {
 		return err
 	}
