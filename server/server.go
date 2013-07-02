@@ -23,6 +23,7 @@ func main() {
 	http.HandleFunc("/revilr", indexHandler)
 	http.HandleFunc("/user", userHandler)
 	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/register", registerHandler)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("templates/resources"))))
 	http.ListenAndServe(":8080", nil)
 }
@@ -62,7 +63,7 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func loginHandler(writer http.ResponseWriter, request *http.Request) {
-	DisplayLogin(writer)
+	DisplayLogin(writer, "")
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
@@ -91,12 +92,18 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 		matched := Login(user, password)
 		if matched {
 			DisplayUser(writer, user)
+			return
 		}
 	}
+	DisplayLogin(writer, "failed")
 }
 
 func parseUser(request *http.Request) (username, password string) {
 	username = request.FormValue("username")
 	password = request.FormValue("password")
 	return
+}
+
+func registerHandler(writer http.ResponseWriter, request *http.Request) {
+	DisplayRegister(writer)
 }

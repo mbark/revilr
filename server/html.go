@@ -12,6 +12,7 @@ var navbar = parseFile("templates/navbar.html")
 var display = parseFile("templates/display.html")
 var login = parseFile("templates/login.html")
 var user = parseFile("templates/user.html")
+var register = parseFile("templates/register.html")
 
 func parseFile(file string) *mustache.Template {
 	tmpl, err := mustache.ParseFile(file)
@@ -29,9 +30,10 @@ func DisplayRevils(revils []revil, revilType string, writer http.ResponseWriter)
 	fmt.Fprintf(writer, html)
 }
 
-func DisplayLogin(writer http.ResponseWriter) {
+func DisplayLogin(writer http.ResponseWriter, success string) {
 	data := make(map[string]interface{})
 	data["navbar"] = getNavbar("login")
+	data[success] = true
 	html := login.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
@@ -42,6 +44,14 @@ func DisplayUser(writer http.ResponseWriter, userStruct *User) {
 	data["navbar"] = getNavbar("user")
 	data["username"] = userStruct.Username
 	html := user.RenderInLayout(layout, data)
+
+	fmt.Fprintf(writer, html)
+}
+
+func DisplayRegister(writer http.ResponseWriter) {
+	data := make(map[string]interface{})
+	data["navbar"] = getNavbar("register")
+	html := register.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
 }
