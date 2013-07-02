@@ -61,11 +61,11 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	DisplayRevils(revils, "all", writer)
 }
 
-func userHandler(writer http.ResponseWriter, request *http.Request) {
+func loginHandler(writer http.ResponseWriter, request *http.Request) {
 	DisplayLogin(writer)
 }
 
-func loginHandler(writer http.ResponseWriter, request *http.Request) {
+func userHandler(writer http.ResponseWriter, request *http.Request) {
 	username, password := parseUser(request)
 	if username == "" {
 		fmt.Println("Invalid username")
@@ -88,9 +88,10 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 			fmt.Println("Created user", username, "with password", password)
 		}
 	} else {
-		fmt.Println("Found matching user", user.Username)
 		matched := Login(user, password)
-		fmt.Println("Could login in =", matched)
+		if matched {
+			DisplayUser(writer, user)
+		}
 	}
 }
 
