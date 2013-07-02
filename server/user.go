@@ -9,13 +9,13 @@ type User struct {
 	Password []byte
 }
 
-func (u *User) SetPassword(password string) {
+func (u *User) SetPassword(password string) error {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		// you're in deep shit, son.
-		panic(err)
+		return err
 	}
 	u.Password = hashedPass
+	return nil
 }
 
 func Login(user *User, password string) bool {

@@ -10,6 +10,7 @@ import (
 var layout = parseFile("templates/layout.html")
 var navbar = parseFile("templates/navbar.html")
 var display = parseFile("templates/display.html")
+var login = parseFile("templates/login.html")
 
 func parseFile(file string) *mustache.Template {
 	tmpl, err := mustache.ParseFile(file)
@@ -19,10 +20,18 @@ func parseFile(file string) *mustache.Template {
 	return tmpl
 }
 
-func displayRevils(revils []revil, revilType string, writer http.ResponseWriter) {
+func DisplayRevils(revils []revil, revilType string, writer http.ResponseWriter) {
 	data := formatRevilsForOutput(revils, revilType)
 	data["navbar"] = getNavbar(revilType)
 	html := display.RenderInLayout(layout, data)
+
+	fmt.Fprintf(writer, html)
+}
+
+func DisplayLogin(writer http.ResponseWriter) {
+	data := make(map[string]interface{})
+	data["navbar"] = getNavbar("login")
+	html := login.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
 }

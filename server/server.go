@@ -22,6 +22,7 @@ func main() {
 	http.HandleFunc("/revilr/", httpHandler)
 	http.HandleFunc("/revilr", indexHandler)
 	http.HandleFunc("/user", userHandler)
+	http.HandleFunc("/login", loginHandler)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("templates/resources"))))
 	http.ListenAndServe(":8080", nil)
 }
@@ -52,16 +53,24 @@ func postHandler(request *http.Request, revilType string) {
 
 func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
 	revils := getRevilsOfType(revilType)
-	displayRevils(revils, revilType, writer)
+	DisplayRevils(revils, revilType, writer)
 }
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	revils := getAllRevilsInDatabase()
-	displayRevils(revils, "all", writer)
+	DisplayRevils(revils, "all", writer)
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
+	DisplayLogin(writer)
+}
+
+func loginHandler(writer http.ResponseWriter, request *http.Request) {
 	username, password := parseUser(request)
+	if username == "" {
+		fmt.Println("Invalid username")
+		return
+	}
 	user, err := getUser(username)
 	if err != nil {
 		fmt.Println(err)
@@ -69,11 +78,15 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	if user.Username == "" {
+		// register the user
 		user = &User{Username: username}
 		user.SetPassword(password)
-
-		createUser(user)
-		fmt.Println("Made user", username, "with password", password)
+		err = createUser(user)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("Created user", username, "with password", password)
+		}
 	} else {
 		fmt.Println("Found matching user", user.Username)
 		matched := Login(user, password)
@@ -82,7 +95,7 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func parseUser(request *http.Request) (username, password string) {
-	username = request.FormValue("user")
+	username = request.FormValue("username")
 	password = request.FormValue("password")
 	return
 }
