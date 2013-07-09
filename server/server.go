@@ -63,39 +63,41 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func loginHandler(writer http.ResponseWriter, request *http.Request) {
-	DisplayLogin(writer, "")
+	if request.Method == "POST" {
+		username, password := parseUser(request)
+
+		user := verifyUser(username)
+		if user == nil {
+			DisplayLogin(writer, "invalidUsername")
+			return
+		}
+
+		loggedIn := user.Login(password)
+		if loggedIn {
+			http.Redirect(writer, request, "/user", http.StatusFound)
+		} else {
+			DisplayLogin(writer, "invalidPassword")
+			return
+		}
+	} else if request.Method == "GET" {
+		DisplayLogin(writer, "")
+	}
+}
+
+func verifyUser(username string) *User {
+	if username != "" {
+		user, err := findUser(username)
+		if err == nil {
+			if user.Username != "" {
+				return user
+			}
+		}
+	}
+	return nil
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
-	username, password := parseUser(request)
-	if username == "" {
-		fmt.Println("Invalid username")
-		return
-	}
-	user, err := getUser(username)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	if user.Username == "" {
-		// register the user
-		user = &User{Username: username}
-		user.SetPassword(password)
-		err = createUser(user)
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			fmt.Println("Created user", username, "with password", password)
-		}
-	} else {
-		matched := Login(user, password)
-		if matched {
-			DisplayUser(writer, user)
-			return
-		}
-	}
-	DisplayLogin(writer, "failed")
+	DisplayUser(writer, "hej")
 }
 
 func parseUser(request *http.Request) (username, password string) {
@@ -105,5 +107,27 @@ func parseUser(request *http.Request) (username, password string) {
 }
 
 func registerHandler(writer http.ResponseWriter, request *http.Request) {
-	DisplayRegister(writer)
+	if request.Method == "POST" {
+		username, password := parseUser(request)
+		if verifyUser(username) != nil {
+			fmt.Println("username is taken")
+			DisplayRegister(writer, "usernameTaken")
+			return
+		}
+		user := &User{Username: username}
+		user.SetPassword(password)
+		err := createUser(user)
+
+		if err != nil {
+			fmt.Println("failed to create...")
+			DisplayRegister(writer, "failed")
+			return
+		}
+
+		fmt.Println("successfull!")
+		http.Redirect(writer, request, "/user", http.StatusFound)
+		return
+	} else if request.Method == "GET" {
+		DisplayRegister(writer, "")
+	}
 }

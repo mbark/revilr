@@ -39,18 +39,19 @@ func DisplayLogin(writer http.ResponseWriter, success string) {
 	fmt.Fprintf(writer, html)
 }
 
-func DisplayUser(writer http.ResponseWriter, userStruct *User) {
+func DisplayUser(writer http.ResponseWriter, username string) {
 	data := make(map[string]interface{})
 	data["navbar"] = getNavbar("user")
-	data["username"] = userStruct.Username
+	data["username"] = username
 	html := user.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
 }
 
-func DisplayRegister(writer http.ResponseWriter) {
+func DisplayRegister(writer http.ResponseWriter, success string) {
 	data := make(map[string]interface{})
 	data["navbar"] = getNavbar("register")
+	data[success] = true
 	html := register.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)

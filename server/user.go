@@ -18,7 +18,7 @@ func (u *User) SetPassword(password string) error {
 	return nil
 }
 
-func Login(user *User, password string) bool {
+func (user *User) Login(password string) bool {
 	err := bcrypt.CompareHashAndPassword(user.Password, []byte(password))
 	return (err == nil)
 }

@@ -134,7 +134,7 @@ func rowToRevil(row *sql.Rows) revil {
 	return revil{Type: rtype, Url: url, Comment: comment, Date: date}
 }
 
-func getUser(username string) (user *User, err error) {
+func findUser(username string) (user *User, err error) {
 	rows, err := database.Query("select username, password from user WHERE username=?", username)
 	if err != nil {
 		return

@@ -1,19 +1,20 @@
 {{{navbar}}}
 
 <div id="main">
-  <form action="/user" method="POST" class="form-horizontal">
+  <form action="/login" method="POST" class="form-horizontal">
     <div class="control-group">
       <label class="control-label" for="username">Username</label>
       <div class="controls">
         <input type="text" name="username" id="username" placeholder="Username">
       </div>
     </div>
+    {{#invalidUsername}}<span class="help-inline">Incorrect username</span>{{/invalidUsername}}
     <div class="control-group {{#failed}}error{{/failed}}">
       <label class="control-label" for="password">Password</label>
       <div class="controls">
         <input type="password" name="password" id="password" placeholder="Password">
       </div>
-      {{#failed}}<span class="help-inline">Incorrect password</span>{{/failed}}
+      {{#invalidPassword}}<span class="help-inline">Incorrect password</span>{{/invalidPassword}}
     </div>
     <div class="control-group">
       <div class="controls">
