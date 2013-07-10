@@ -28,3 +28,7 @@ Additional downloads needed
 [Mustache](https://github.com/hoisie/mustache)
 
 	go get github.com/hoisie/mustache
+
+[Gorilla](http://www.gorillatoolkit.org/pkg/sessions)
+
+		go get github.com/gorilla/sessions

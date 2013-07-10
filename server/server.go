@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gorilla/sessions"
 	"net/http"
 	"regexp"
 )
@@ -10,10 +11,13 @@ const lenPath = len("/revilr/")
 
 var validTypes = regexp.MustCompile("^(page|image|selection)$")
 
+var store = sessions.NewCookieStore([]byte("this-is-a-secret"))
+var user_session = "users"
+
 func main() {
 	db, err := getDatabase()
 	if err != nil {
-		return
+		panic(err)
 	}
 
 	database = db
@@ -63,6 +67,10 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func loginHandler(writer http.ResponseWriter, request *http.Request) {
+	session, err := store.Get(request, user_session)
+	if err != nil {
+		panic(err)
+	}
 	if request.Method == "POST" {
 		username, password := parseUser(request)
 
@@ -74,10 +82,13 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 
 		loggedIn := user.Login(password)
 		if loggedIn {
+			session.Values["user"] = user.Username
+			err = session.Save(request, writer)
+			fmt.Println(session.Values)
+			fmt.Println("error saving", err)
 			http.Redirect(writer, request, "/user", http.StatusFound)
 		} else {
 			DisplayLogin(writer, "invalidPassword")
-			return
 		}
 	} else if request.Method == "GET" {
 		DisplayLogin(writer, "")
@@ -97,7 +108,18 @@ func verifyUser(username string) *User {
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
-	DisplayUser(writer, "hej")
+	session, err := store.Get(request, user_session)
+	if err != nil {
+		//when will this happen?
+		fmt.Println(err)
+	}
+	username, ok := session.Values["user"].(string)
+	if ok {
+		DisplayUser(writer, username)
+	} else {
+		http.Redirect(writer, request, "/login", http.StatusFound)
+	}
+
 }
 
 func parseUser(request *http.Request) (username, password string) {
@@ -110,7 +132,6 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
 		username, password := parseUser(request)
 		if verifyUser(username) != nil {
-			fmt.Println("username is taken")
 			DisplayRegister(writer, "usernameTaken")
 			return
 		}
@@ -119,12 +140,10 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 		err := createUser(user)
 
 		if err != nil {
-			fmt.Println("failed to create...")
 			DisplayRegister(writer, "failed")
 			return
 		}
 
-		fmt.Println("successfull!")
 		http.Redirect(writer, request, "/user", http.StatusFound)
 		return
 	} else if request.Method == "GET" {
