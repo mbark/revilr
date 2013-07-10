@@ -112,6 +112,7 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		//when will this happen?
 		fmt.Println(err)
+		return
 	}
 	username, ok := session.Values["user"].(string)
 	if ok {
