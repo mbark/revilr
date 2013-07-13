@@ -28,6 +28,7 @@ func main() {
 	http.HandleFunc("/user", userHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
+	http.HandleFunc("/logout", logoutHandler)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("templates/resources"))))
 	http.ListenAndServe(":8080", nil)
 }
@@ -71,6 +72,9 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	if session.Values["user"] != nil {
+		http.Redirect(writer, request, "/user", http.StatusFound)
+	}
 	if request.Method == "POST" {
 		username, password := parseUser(request)
 
@@ -84,8 +88,6 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 		if loggedIn {
 			session.Values["user"] = user.Username
 			err = session.Save(request, writer)
-			fmt.Println(session.Values)
-			fmt.Println("error saving", err)
 			http.Redirect(writer, request, "/user", http.StatusFound)
 		} else {
 			DisplayLogin(writer, "invalidPassword")
@@ -150,4 +152,22 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 	} else if request.Method == "GET" {
 		DisplayRegister(writer, "")
 	}
+}
+
+func logoutHandler(writer http.ResponseWriter, request *http.Request) {
+	session, err := store.Get(request, user_session)
+	if err != nil {
+		panic(err)
+	}
+	if request.Method == "POST" {
+		session.Values["user"] = nil
+		session.Save(request, writer)
+	}
+	var isLoggedOut string
+	if session.Values["user"] == nil {
+		isLoggedOut = "loggedOut"
+	} else {
+		isLoggedOut = ""
+	}
+	DisplayLogout(writer, isLoggedOut)
 }

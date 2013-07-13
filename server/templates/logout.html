@@ -1,0 +1,8 @@
+{{{navbar}}}
+
+<div id="main">
+  {{#loggedOut}}Goodbye!{{/loggedOut}}
+  {{^loggedOut}}<form action="/logout" method="POST">
+    <button class="btn">Logout</button>
+  </form>{{/loggedOut}}
+</div>

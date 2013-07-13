@@ -11,6 +11,7 @@ var layout = parseFile("templates/layout.html")
 var navbar = parseFile("templates/navbar.html")
 var display = parseFile("templates/display.html")
 var login = parseFile("templates/login.html")
+var logout = parseFile("templates/logout.html")
 var user = parseFile("templates/user.html")
 var register = parseFile("templates/register.html")
 
@@ -35,6 +36,15 @@ func DisplayLogin(writer http.ResponseWriter, success string) {
 	data["navbar"] = getNavbar("login")
 	data[success] = true
 	html := login.RenderInLayout(layout, data)
+
+	fmt.Fprintf(writer, html)
+}
+
+func DisplayLogout(writer http.ResponseWriter, isLoggedOut string) {
+	data := make(map[string]interface{})
+	data["navbar"] = getNavbar("logout")
+	data[isLoggedOut] = true
+	html := logout.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
 }
