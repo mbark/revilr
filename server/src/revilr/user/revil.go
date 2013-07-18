@@ -1,17 +1,18 @@
-package main
+package user
 
 import (
 	"fmt"
+	"net/url"
 )
 
-type revil struct {
+type Revil struct {
 	Type    string
 	Url     string
 	Comment string
 	Date    string
 }
 
-func (r revil) toString() string {
+func (r Revil) toString() string {
 	var result string
 
 	result += "{"
@@ -23,11 +24,11 @@ func (r revil) toString() string {
 	return result
 }
 
-func (r revil) printRevil() {
+func (r Revil) PrintRevil() {
 	fmt.Println(r.toString())
 }
 
-func (rev revil) asMap() map[string]interface{} {
+func (rev Revil) AsMap() map[string]interface{} {
 	data := make(map[string]interface{})
 
 	data["url"] = rev.Url
@@ -37,4 +38,15 @@ func (rev revil) asMap() map[string]interface{} {
 	data["type"] = rev.Type
 
 	return data
+}
+
+
+func parseUrl(rev Revil) string {
+	parsed, err := url.Parse(rev.Url)
+	if err != nil {
+		fmt.Println(err)
+		return rev.Url
+	}
+
+	return parsed.Host
 }

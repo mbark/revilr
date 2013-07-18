@@ -1,6 +1,7 @@
-package main
+package db
 
 import (
+	"revilr/user"
 	"database/sql"
 	"fmt"
 	_ "github.com/mattn/go-sqlite3"
@@ -10,14 +11,16 @@ import (
 
 var database *sql.DB
 
-func getDatabase() (db *sql.DB, err error) {
+func OpenConnection() (db *sql.DB, err error) {
 	dbPath := "./revils.db"
 
 	if exists, _ := fileExists(dbPath); exists {
-		db, err = sql.Open("sqlite3", "./"+dbPath)
+		db, err = sql.Open("sqlite3", dbPath)
 	} else {
 		db, err = instantiateDatabase(dbPath)
 	}
+	database = db
+
 	return
 }
 
@@ -54,7 +57,7 @@ func instantiateDatabase(dbPath string) (db *sql.DB, err error) {
 	return
 }
 
-func insertIntoDatabase(rev revil) error {
+func InsertIntoDatabase(rev user.Revil) error {
 	stmt, err := database.Prepare("insert into revil(url, type, comment) values(?, ?, ?)")
 	if err != nil {
 		return err
@@ -67,35 +70,22 @@ func insertIntoDatabase(rev revil) error {
 	return nil
 }
 
-func printAllRevilsInDatabase() {
-	rows, err := database.Query("SELECT url, type, comment, date FROM revil")
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		rowToRevil(rows).printRevil()
-	}
-}
-
-func getAllRevilsInDatabase() []revil {
+func GetAllRevilsInDatabase() []user.Revil {
 	rows, err := database.Query("SELECT url, type, comment, date FROM revil ORDER BY ROWID DESC")
 	if err != nil {
 		fmt.Println("Error:", err)
-		return make([]revil, 0)
+		return make([]user.Revil, 0)
 	}
 	defer rows.Close()
 
 	return rowsToRevils(rows)
 }
 
-func getRevilsOfType(rtype string) []revil {
+func GetRevilsOfType(rtype string) []user.Revil {
 	rows, err := database.Query("SELECT url, type, comment, date FROM revil WHERE type=? ORDER BY ROWID DESC", rtype)
 	if err != nil {
 		fmt.Println("Error ", err)
-		return make([]revil, 0)
+		return make([]user.Revil, 0)
 	}
 	defer rows.Close()
 
@@ -103,8 +93,8 @@ func getRevilsOfType(rtype string) []revil {
 	return revils
 }
 
-func rowsToRevils(rows *sql.Rows) []revil {
-	revils := make([]revil, 0)
+func rowsToRevils(rows *sql.Rows) []user.Revil {
+	revils := make([]user.Revil, 0)
 
 	for rows.Next() {
 		revils = append(revils, rowToRevil(rows))
@@ -113,11 +103,11 @@ func rowsToRevils(rows *sql.Rows) []revil {
 	return revils
 }
 
-func getRevilInDatabase(row int) revil {
+func GetRevilInDatabase(row int) user.Revil {
 	rows, err := database.Query("select url, type, comment from revil LIMIT 1 OFFSET " + strconv.Itoa(row))
 	if err != nil {
 		fmt.Println("Error:", err)
-		return *new(revil)
+		return *new(user.Revil)
 	}
 	defer rows.Close()
 
@@ -125,16 +115,16 @@ func getRevilInDatabase(row int) revil {
 	return rowToRevil(rows)
 }
 
-func rowToRevil(row *sql.Rows) revil {
+func rowToRevil(row *sql.Rows) user.Revil {
 	var url string
 	var rtype string
 	var comment string
 	var date string
 	row.Scan(&url, &rtype, &comment, &date)
-	return revil{Type: rtype, Url: url, Comment: comment, Date: date}
+	return user.Revil{Type: rtype, Url: url, Comment: comment, Date: date}
 }
 
-func findUser(username string) (user *User, err error) {
+func FindUser(username string) (user *user.User, err error) {
 	rows, err := database.Query("select username, password from user WHERE username=?", username)
 	if err != nil {
 		return
@@ -146,14 +136,14 @@ func findUser(username string) (user *User, err error) {
 	return
 }
 
-func rowToUser(row *sql.Rows) *User {
+func rowToUser(row *sql.Rows) *user.User {
 	var username string
 	var password []byte
 	row.Scan(&username, &password)
-	return NewType(username, password)
+	return user.NewType(username, password)
 }
 
-func createUser(user *User) error {
+func CreateUser(user *user.User) error {
 	stmt, err := database.Prepare("insert into user(username, password) values(?, ?)")
 	if err != nil {
 		return err

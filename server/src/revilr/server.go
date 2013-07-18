@@ -1,6 +1,8 @@
 package main
 
 import (
+	"revilr/db"
+	"revilr/user"
 	"encoding/gob"
 	"fmt"
 	"github.com/gorilla/sessions"
@@ -16,15 +18,13 @@ var store = sessions.NewCookieStore([]byte("this-is-a-secret"))
 var user_session = "users"
 
 func main() {
-	db, err := getDatabase()
+	db, err := db.OpenConnection()
 	if err != nil {
 		panic(err)
 	}
+	defer db.Close()
 
-	database = db
-	defer database.Close()
-
-	gob.Register(User{})
+	gob.Register(user.User{})
 
 	http.HandleFunc("/revilr/", httpHandler)
 	http.HandleFunc("/revilr", indexHandler)
@@ -32,7 +32,7 @@ func main() {
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/logout", logoutHandler)
-	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("templates/resources"))))
+	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -55,18 +55,18 @@ func parseType(request *http.Request) string {
 }
 
 func postHandler(request *http.Request, revilType string) {
-	rev := revil{Type: revilType, Url: request.FormValue("url"), Comment: request.FormValue("c")}
-	rev.printRevil()
-	insertIntoDatabase(rev)
+	rev := user.Revil{Type: revilType, Url: request.FormValue("url"), Comment: request.FormValue("c")}
+	rev.PrintRevil()
+	db.InsertIntoDatabase(rev)
 }
 
 func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
-	revils := getRevilsOfType(revilType)
+	revils := db.GetRevilsOfType(revilType)
 	DisplayRevils(revils, revilType, writer)
 }
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
-	revils := getAllRevilsInDatabase()
+	revils := db.GetAllRevilsInDatabase()
 	DisplayRevils(revils, "all", writer)
 }
 
@@ -105,9 +105,9 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func verifyUser(username string) *User {
+func verifyUser(username string) *user.User {
 	if username != "" {
-		user, err := findUser(username)
+		user, err := db.FindUser(username)
 		if err == nil {
 			if user.Username != "" {
 				return user
@@ -124,7 +124,7 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	user, ok := session.Values["user"].(User)
+	user, ok := session.Values["user"].(user.User)
 	if ok {
 		DisplayUser(writer, user.Username)
 	} else {
@@ -146,9 +146,9 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 			DisplayRegister(writer, "usernameTaken")
 			return
 		}
-		user := &User{Username: username}
+		user := &user.User{Username: username}
 		user.SetPassword(password)
-		err := createUser(user)
+		err := db.CreateUser(user)
 
 		if err != nil {
 			DisplayRegister(writer, "failed")

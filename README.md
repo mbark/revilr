@@ -18,12 +18,23 @@ Your Path should now contain the following, if not add as appropriate:
 
 Here TDM-GCC is installed at MinGW64.
 
-Finally run
+Additional setup
+---------------------------
+
+In order to be able to build the project you need to set the GOPATH environment variable to the project home. The project home is at
+
+	revilr/server
+
+To build the project run
+
+	go build revilr
+
+Packages used
+---------------------------
+
+[sqlite3](https://github.com/mattn/go-sqlite3)
 
 	go get github.com/mattn/go-sqlite3
-
-Additional downloads needed
----------------------------
 
 [Mustache](https://github.com/hoisie/mustache)
 
@@ -31,4 +42,8 @@ Additional downloads needed
 
 [Gorilla](http://www.gorillatoolkit.org/pkg/sessions)
 
-		go get github.com/gorilla/sessions
+	go get github.com/gorilla/sessions
+
+[bcrypt](http://godoc.org/code.google.com/p/go.crypto/bcrypt)
+
+	go get code.google.com/p/go.crypto/bcrypt

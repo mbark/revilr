@@ -1,19 +1,19 @@
 package main
 
 import (
+	"revilr/user"
 	"fmt"
 	"github.com/hoisie/mustache"
 	"net/http"
-	"net/url"
 )
 
-var layout = parseFile("templates/layout.html")
-var navbar = parseFile("templates/navbar.html")
-var display = parseFile("templates/display.html")
-var login = parseFile("templates/login.html")
-var logout = parseFile("templates/logout.html")
-var user = parseFile("templates/user.html")
-var register = parseFile("templates/register.html")
+var layout = parseFile("resources/html/layout.html")
+var navbar = parseFile("resources/html/navbar.html")
+var display = parseFile("resources/html/display.html")
+var login = parseFile("resources/html/login.html")
+var logout = parseFile("resources/html/logout.html")
+var userUrl = parseFile("resources/html/user.html")
+var register = parseFile("resources/html/register.html")
 
 func parseFile(file string) *mustache.Template {
 	tmpl, err := mustache.ParseFile(file)
@@ -23,7 +23,7 @@ func parseFile(file string) *mustache.Template {
 	return tmpl
 }
 
-func DisplayRevils(revils []revil, revilType string, writer http.ResponseWriter) {
+func DisplayRevils(revils []user.Revil, revilType string, writer http.ResponseWriter) {
 	data := formatRevilsForOutput(revils, revilType)
 	data["navbar"] = getNavbar(revilType)
 	html := display.RenderInLayout(layout, data)
@@ -53,7 +53,7 @@ func DisplayUser(writer http.ResponseWriter, username string) {
 	data := make(map[string]interface{})
 	data["navbar"] = getNavbar("user")
 	data["username"] = username
-	html := user.RenderInLayout(layout, data)
+	html := userUrl.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
 }
@@ -67,14 +67,14 @@ func DisplayRegister(writer http.ResponseWriter, success string) {
 	fmt.Fprintf(writer, html)
 }
 
-func formatRevilsForOutput(revils []revil, revilType string) map[string]interface{} {
+func formatRevilsForOutput(revils []user.Revil, revilType string) map[string]interface{} {
 	values := make(map[string]interface{})
 	values["revils"] = getListOfRevilMaps(revils)
 	values["navbar"] = getNavbar(revilType)
 	return values
 }
 
-func getListOfRevilMaps(revils []revil) []map[string]interface{} {
+func getListOfRevilMaps(revils []user.Revil) []map[string]interface{} {
 	revilMaps := make([]map[string]interface{}, len(revils))
 
 	for key, rev := range revils {
@@ -84,21 +84,11 @@ func getListOfRevilMaps(revils []revil) []map[string]interface{} {
 	return revilMaps
 }
 
-func getMapForRevil(rev revil) map[string]interface{} {
+func getMapForRevil(rev user.Revil) map[string]interface{} {
 	dataType := make(map[string]interface{})
-	dataType[rev.Type] = rev.asMap()
+	dataType[rev.Type] = rev.AsMap()
 
 	return dataType
-}
-
-func parseUrl(rev revil) string {
-	parsed, err := url.Parse(rev.Url)
-	if err != nil {
-		fmt.Println(err)
-		return rev.Url
-	}
-
-	return parsed.Host
 }
 
 func getNavbar(revilType string) string {
