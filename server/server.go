@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
 	"github.com/gorilla/sessions"
 	"net/http"
@@ -22,6 +23,8 @@ func main() {
 
 	database = db
 	defer database.Close()
+
+	gob.Register(User{})
 
 	http.HandleFunc("/revilr/", httpHandler)
 	http.HandleFunc("/revilr", indexHandler)
@@ -86,9 +89,14 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 
 		loggedIn := user.Login(password)
 		if loggedIn {
-			session.Values["user"] = user.Username
+			session.Values["user"] = user
 			err = session.Save(request, writer)
-			http.Redirect(writer, request, "/user", http.StatusFound)
+			if err == nil {
+				http.Redirect(writer, request, "/user", http.StatusFound)
+			} else {
+				panic(err)
+			}
+
 		} else {
 			DisplayLogin(writer, "invalidPassword")
 		}
@@ -116,9 +124,9 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	username, ok := session.Values["user"].(string)
+	user, ok := session.Values["user"].(User)
 	if ok {
-		DisplayUser(writer, username)
+		DisplayUser(writer, user.Username)
 	} else {
 		http.Redirect(writer, request, "/login", http.StatusFound)
 	}

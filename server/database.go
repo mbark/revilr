@@ -150,7 +150,7 @@ func rowToUser(row *sql.Rows) *User {
 	var username string
 	var password []byte
 	row.Scan(&username, &password)
-	return &User{Username: username, Password: password}
+	return NewType(username, password)
 }
 
 func createUser(user *User) error {
