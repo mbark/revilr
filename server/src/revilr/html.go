@@ -1,10 +1,10 @@
 package main
 
 import (
-	"revilr/user"
 	"fmt"
 	"github.com/hoisie/mustache"
 	"net/http"
+	"revilr/user"
 )
 
 var layout = parseFile("resources/html/layout.html")
@@ -51,7 +51,7 @@ func DisplayLogout(writer http.ResponseWriter, isLoggedOut string) {
 
 func DisplayUser(writer http.ResponseWriter, username string) {
 	data := make(map[string]interface{})
-	data["navbar"] = getNavbar("user")
+	data["navbar"] = getNavbarUser("user", username)
 	data["username"] = username
 	html := userUrl.RenderInLayout(layout, data)
 
@@ -94,6 +94,17 @@ func getMapForRevil(rev user.Revil) map[string]interface{} {
 func getNavbar(revilType string) string {
 	data := make(map[string]interface{})
 	data[revilType] = true
+	data["loggedIn"] = false
+	html := navbar.Render(data)
+
+	return html
+}
+
+func getNavbarUser(revilType string, username string) string {
+	data := make(map[string]interface{})
+	data[revilType] = true
+	data["username"] = username
+	data["loggedIn"] = true
 	html := navbar.Render(data)
 
 	return html

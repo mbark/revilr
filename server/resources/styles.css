@@ -27,23 +27,24 @@ li a {
 	border-bottom: 4px solid #F5F5F5;
 }
 
-li.active a {
+li.open>a {
 	background: #333 !important;
+	border-top: 4px solid #333;
 	color: #F5F5F5 !important;
 	text-shadow: none !important;
 	box-shadow: none !important;
 	border-bottom: 4px solid #333;
 }
 
-li.page.active a {
+li.page.open>a {
 	border-top: 4px solid #3AA6D0;
 }
 
-li.image.active a {
+li.image.open>a {
 	border-top: 4px solid #BF9330;
 }
 
-li.selection.active a {
+li.selection.open>a {
 	border-top: 4px solid #BF4330;
 }
 
@@ -112,6 +113,10 @@ li.selection.active a {
 .revil-date {
 	float: right;
 	font-size: 11px;
+}
+
+a.dropdown-toggle {
+	cursor: pointer;
 }
 
 blockquote {

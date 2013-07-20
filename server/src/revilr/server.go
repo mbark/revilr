@@ -1,13 +1,13 @@
 package main
 
 import (
-	"revilr/db"
-	"revilr/user"
 	"encoding/gob"
 	"fmt"
 	"github.com/gorilla/sessions"
 	"net/http"
 	"regexp"
+	"revilr/db"
+	"revilr/user"
 )
 
 const lenPath = len("/revilr/")
@@ -130,7 +130,6 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 	} else {
 		http.Redirect(writer, request, "/login", http.StatusFound)
 	}
-
 }
 
 func parseUser(request *http.Request) (username, password string) {
@@ -167,10 +166,8 @@ func logoutHandler(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	if request.Method == "POST" {
-		session.Values["user"] = nil
-		session.Save(request, writer)
-	}
+	session.Values["user"] = nil
+	session.Save(request, writer)
 	var isLoggedOut string
 	if session.Values["user"] == nil {
 		isLoggedOut = "loggedOut"
