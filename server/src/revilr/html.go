@@ -23,44 +23,43 @@ func parseFile(file string) *mustache.Template {
 	return tmpl
 }
 
-func DisplayRevils(revils []user.Revil, revilType string, writer http.ResponseWriter) {
+func DisplayRevils(revils []user.Revil, revilType string, writer http.ResponseWriter, request *http.Request) {
 	data := formatRevilsForOutput(revils, revilType)
-	data["navbar"] = getNavbar(revilType)
+	data["navbar"] = getNavbar(revilType, request)
 	html := display.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
 }
 
-func DisplayLogin(writer http.ResponseWriter, success string) {
+func DisplayLogin(writer http.ResponseWriter, success string, request *http.Request) {
 	data := make(map[string]interface{})
-	data["navbar"] = getNavbar("login")
+	data["navbar"] = getNavbar("login", request)
 	data[success] = true
 	html := login.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
 }
 
-func DisplayLogout(writer http.ResponseWriter, isLoggedOut string) {
+func DisplayLogout(writer http.ResponseWriter, loggedIn bool, request *http.Request) {
 	data := make(map[string]interface{})
-	data["navbar"] = getNavbar("logout")
-	data[isLoggedOut] = true
+	data["navbar"] = getNavbar("logout", request)
+	data["loggedIn"] = loggedIn
 	html := logout.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
 }
 
-func DisplayUser(writer http.ResponseWriter, username string) {
+func DisplayUser(writer http.ResponseWriter, request *http.Request) {
 	data := make(map[string]interface{})
-	data["navbar"] = getNavbarUser("user", username)
-	data["username"] = username
+	data["navbar"] = getNavbar("user", request)
 	html := userUrl.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
 }
 
-func DisplayRegister(writer http.ResponseWriter, success string) {
+func DisplayRegister(writer http.ResponseWriter, success string, request *http.Request) {
 	data := make(map[string]interface{})
-	data["navbar"] = getNavbar("register")
+	data["navbar"] = getNavbar("register", request)
 	data[success] = true
 	html := register.RenderInLayout(layout, data)
 
@@ -70,7 +69,6 @@ func DisplayRegister(writer http.ResponseWriter, success string) {
 func formatRevilsForOutput(revils []user.Revil, revilType string) map[string]interface{} {
 	values := make(map[string]interface{})
 	values["revils"] = getListOfRevilMaps(revils)
-	values["navbar"] = getNavbar(revilType)
 	return values
 }
 
@@ -91,20 +89,14 @@ func getMapForRevil(rev user.Revil) map[string]interface{} {
 	return dataType
 }
 
-func getNavbar(revilType string) string {
+func getNavbar(revilType string, request *http.Request) string {
+	loggedIn, username := getUsername(request)
 	data := make(map[string]interface{})
 	data[revilType] = true
-	data["loggedIn"] = false
-	html := navbar.Render(data)
-
-	return html
-}
-
-func getNavbarUser(revilType string, username string) string {
-	data := make(map[string]interface{})
-	data[revilType] = true
-	data["username"] = username
-	data["loggedIn"] = true
+	data["loggedIn"] = loggedIn
+	if loggedIn {
+		data["username"] = username
+	}
 	html := navbar.Render(data)
 
 	return html

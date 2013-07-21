@@ -7,7 +7,7 @@ body {
 }
 
 a {
-	color: black !important;
+	color: black;
 }
 
 .navbar-inner {
@@ -36,15 +36,15 @@ li.open>a {
 	border-bottom: 4px solid #333;
 }
 
-li.page.open>a {
+.navbar .nav > li.page.open > a, .navbar .nav > li.page > a:hover {
 	border-top: 4px solid #3AA6D0;
 }
 
-li.image.open>a {
+.navbar .nav > li.image.open > a, .navbar .nav > li.image > a:hover {
 	border-top: 4px solid #BF9330;
 }
 
-li.selection.open>a {
+.navbar .nav > li.selection.open > a, .navbar .nav > li.selection > a:hover {
 	border-top: 4px solid #BF4330;
 }
 
@@ -117,6 +117,11 @@ li.selection.open>a {
 
 a.dropdown-toggle {
 	cursor: pointer;
+}
+
+.dropdown-menu > li > a:hover, .dropdown-menu > li > a:focus, .dropdown-submenu:hover > a, .dropdown-submenu:focus > a {
+	background: #333;
+	color: #FFF;
 }
 
 blockquote {

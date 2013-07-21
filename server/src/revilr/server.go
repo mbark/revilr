@@ -2,8 +2,6 @@ package main
 
 import (
 	"encoding/gob"
-	"fmt"
-	"github.com/gorilla/sessions"
 	"net/http"
 	"regexp"
 	"revilr/db"
@@ -13,9 +11,6 @@ import (
 const lenPath = len("/revilr/")
 
 var validTypes = regexp.MustCompile("^(page|image|selection)$")
-
-var store = sessions.NewCookieStore([]byte("this-is-a-secret"))
-var user_session = "users"
 
 func main() {
 	db, err := db.OpenConnection()
@@ -62,35 +57,34 @@ func postHandler(request *http.Request, revilType string) {
 
 func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
 	revils := db.GetRevilsOfType(revilType)
-	DisplayRevils(revils, revilType, writer)
+	DisplayRevils(revils, revilType, writer, request)
 }
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	revils := db.GetAllRevilsInDatabase()
-	DisplayRevils(revils, "all", writer)
+	DisplayRevils(revils, "all", writer, request)
 }
 
 func loginHandler(writer http.ResponseWriter, request *http.Request) {
-	session, err := store.Get(request, user_session)
-	if err != nil {
-		panic(err)
-	}
+	session := getSession(request)
+
 	if session.Values["user"] != nil {
 		http.Redirect(writer, request, "/user", http.StatusFound)
 	}
+
 	if request.Method == "POST" {
 		username, password := parseUser(request)
 
 		user := verifyUser(username)
 		if user == nil {
-			DisplayLogin(writer, "invalidUsername")
+			DisplayLogin(writer, "invalidUsername", request)
 			return
 		}
 
 		loggedIn := user.Login(password)
 		if loggedIn {
 			session.Values["user"] = user
-			err = session.Save(request, writer)
+			err := session.Save(request, writer)
 			if err == nil {
 				http.Redirect(writer, request, "/user", http.StatusFound)
 			} else {
@@ -98,10 +92,10 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 			}
 
 		} else {
-			DisplayLogin(writer, "invalidPassword")
+			DisplayLogin(writer, "invalidPassword", request)
 		}
 	} else if request.Method == "GET" {
-		DisplayLogin(writer, "")
+		DisplayLogin(writer, "", request)
 	}
 }
 
@@ -118,15 +112,10 @@ func verifyUser(username string) *user.User {
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
-	session, err := store.Get(request, user_session)
-	if err != nil {
-		//when will this happen?
-		fmt.Println(err)
-		return
-	}
-	user, ok := session.Values["user"].(user.User)
-	if ok {
-		DisplayUser(writer, user.Username)
+	loggedIn := getLoggedIn(request)
+
+	if loggedIn {
+		DisplayUser(writer, request)
 	} else {
 		http.Redirect(writer, request, "/login", http.StatusFound)
 	}
@@ -142,7 +131,7 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
 		username, password := parseUser(request)
 		if verifyUser(username) != nil {
-			DisplayRegister(writer, "usernameTaken")
+			DisplayRegister(writer, "usernameTaken", request)
 			return
 		}
 		user := &user.User{Username: username}
@@ -150,29 +139,18 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 		err := db.CreateUser(user)
 
 		if err != nil {
-			DisplayRegister(writer, "failed")
+			DisplayRegister(writer, "failed", request)
 			return
 		}
 
 		http.Redirect(writer, request, "/user", http.StatusFound)
 		return
 	} else if request.Method == "GET" {
-		DisplayRegister(writer, "")
+		DisplayRegister(writer, "", request)
 	}
 }
 
 func logoutHandler(writer http.ResponseWriter, request *http.Request) {
-	session, err := store.Get(request, user_session)
-	if err != nil {
-		panic(err)
-	}
-	session.Values["user"] = nil
-	session.Save(request, writer)
-	var isLoggedOut string
-	if session.Values["user"] == nil {
-		isLoggedOut = "loggedOut"
-	} else {
-		isLoggedOut = ""
-	}
-	DisplayLogout(writer, isLoggedOut)
+	loggedIn := !logOut(writer, request)
+	DisplayLogout(writer, loggedIn, request)
 }
