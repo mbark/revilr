@@ -1,6 +1,12 @@
+var urlField = 'urlField'
+var commentField = 'commentField'
+var buttonOk = 'buttonOk'
+var buttonCancel = 'buttonCancel'
+
+
 function renderText(url, comment) {
-  	document.getElementById('urlField').value = url;
-  	document.getElementById('commentField').value = comment;
+  	document.getElementById(urlField).value = url;
+  	document.getElementById(commentField).value = comment;
 }
 
 function revilNow() {
@@ -8,8 +14,8 @@ function revilNow() {
 	var targetUrl = "http://127.0.0.1:8080/revilr/" + type;
 
 	var posting = $.post(targetUrl, {
-		url: document.getElementById('urlField').value,
-		c: document.getElementById('commentField').value
+		url: document.getElementById(urlField).value,
+		c: document.getElementById(commentField).value
 	});
 	posting.done(function() {
 		alert("Revild " + getFromStorage('type') + "!");
@@ -45,20 +51,20 @@ function setTypeDiv(text, color) {
 }
 
 $(document).ready(function() {
-	document.getElementById('buttonOk').innerHTML = 'Revil ' + getFromStorage('type') + '!';
-  	document.getElementById('buttonOk').addEventListener('click', revilNow);
-  	document.getElementById('buttonCancel').addEventListener('click', exit);
+	document.getElementById(buttonOk).innerHTML = 'Revil ' + getFromStorage('type') + '!';
+  	document.getElementById(buttonOk).addEventListener('click', revilNow);
+  	document.getElementById(buttonCancel).addEventListener('click', exit);
 		
 	var type = getFromStorage('type');
 	if (type == 'selection') {
-		document.getElementById('urlField').setAttribute('readonly');
-		document.getElementById('commentField').setAttribute('readonly');
+		document.getElementById(urlField).setAttribute('readonly');
+		document.getElementById(commentField).setAttribute('readonly');
 		setTypeDiv(type, '#BF4330');
 	} else if (type == 'page') {
-		document.getElementById('urlField').setAttribute('readonly');
+		document.getElementById(urlField).setAttribute('readonly');
 		setTypeDiv(type, '#3AA6D0');
 	} else if (type == 'image') {
-		document.getElementById('urlField').setAttribute('readonly');
+		document.getElementById(urlField).setAttribute('readonly');
 		setTypeDiv(type, '#BF9330');
 	} else {
 		exit();

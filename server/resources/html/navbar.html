@@ -4,10 +4,8 @@
     <ul class="nav">
       <li class="page{{#page}} open{{/page}}"> <a href="/revilr/page">Pages</a></li>
       <li class="image{{#image}} open{{/image}}"><a href="/revilr/image">Images</a></li>
-
       <li class="selection{{#selection}} open{{/selection}}"><a href="/revilr/selection">Selections</a></li>
-
-
+      <li class="revil{{#revil}} open{{/revil}}"><a href="/revil">Revil</a></li>
     </ul>
     <ul class="nav pull-right">
       <li class="dropdown">
@@ -22,8 +20,7 @@
           <li role="presentation">
             <a role="menuitem" tabindex="-1" href="/register">Register</a>
           </li>
-          {{/loggedIn}}
-          {{#loggedIn}}
+          {{/loggedIn}}{{#loggedIn}}
           <li role="presentation">
             <a role="menuitem" tabindex="-1" href="/logout">Logout</a>
           </li>

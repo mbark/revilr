@@ -27,32 +27,43 @@ func main() {
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/logout", logoutHandler)
+	http.HandleFunc("/revil", revilHandler)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
 	http.ListenAndServe(":8080", nil)
 }
 
 func httpHandler(writer http.ResponseWriter, request *http.Request) {
-	revilType := parseType(request)
-	if !validTypes.MatchString(revilType) {
+	revilType, success := parseType(request)
+	if !success {
 		http.NotFound(writer, request)
 		return
 	}
 
 	if request.Method == "POST" {
-		postHandler(request, revilType)
+		success = postHandler(request, revilType)
+		if success {
+			http.Redirect(writer, request, "/revilr", http.StatusFound)
+		} else {
+			http.NotFound(writer, request)
+		}
 	} else if request.Method == "GET" {
 		getHandler(writer, request, revilType)
 	}
 }
 
-func parseType(request *http.Request) string {
-	return request.URL.Path[lenPath:]
+func parseType(request *http.Request) (string, bool) {
+	revilType := request.URL.Path[lenPath:]
+	if !validTypes.MatchString(revilType) {
+		revilType = request.FormValue("type")
+	}
+	return revilType, validTypes.MatchString(revilType)
 }
 
-func postHandler(request *http.Request, revilType string) {
+func postHandler(request *http.Request, revilType string) bool {
 	rev := user.Revil{Type: revilType, Url: request.FormValue("url"), Comment: request.FormValue("c")}
 	rev.PrintRevil()
 	db.InsertIntoDatabase(rev)
+	return true
 }
 
 func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
@@ -153,4 +164,8 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 func logoutHandler(writer http.ResponseWriter, request *http.Request) {
 	loggedIn := !logOut(writer, request)
 	DisplayLogout(writer, loggedIn, request)
+}
+
+func revilHandler(writer http.ResponseWriter, request *http.Request) {
+	DisplayRevil(writer, request)
 }

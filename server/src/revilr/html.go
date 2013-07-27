@@ -14,6 +14,7 @@ var login = parseFile("resources/html/login.html")
 var logout = parseFile("resources/html/logout.html")
 var userUrl = parseFile("resources/html/user.html")
 var register = parseFile("resources/html/register.html")
+var revil = parseFile("resources/html/revil.html")
 
 func parseFile(file string) *mustache.Template {
 	tmpl, err := mustache.ParseFile(file)
@@ -62,6 +63,14 @@ func DisplayRegister(writer http.ResponseWriter, success string, request *http.R
 	data["navbar"] = getNavbar("register", request)
 	data[success] = true
 	html := register.RenderInLayout(layout, data)
+
+	fmt.Fprintf(writer, html)
+}
+
+func DisplayRevil(writer http.ResponseWriter, request *http.Request) {
+	data := make(map[string]interface{})
+	data["navbar"] = getNavbar("revil", request)
+	html := revil.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
 }
