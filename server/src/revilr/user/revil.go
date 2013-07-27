@@ -44,7 +44,7 @@ func (rev Revil) AsMap() map[string]interface{} {
 func parseUrl(rev Revil) string {
 	parsed, err := url.Parse(rev.Url)
 	if err != nil {
-		fmt.Println(err)
+		//fmt.Println(err)
 		return rev.Url
 	}
 

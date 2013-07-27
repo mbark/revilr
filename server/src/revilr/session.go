@@ -19,16 +19,9 @@ func getSession(request *http.Request) *sessions.Session {
 	return session
 }
 
-func getLoggedIn(request *http.Request) bool {
-	return getSession(request).Values["user"] != nil
-}
-
-func getUsername(request *http.Request) (bool, string) {
+func getUser(request *http.Request) (bool, user.User) {
 	user, ok := getSession(request).Values["user"].(user.User)
-	if ok {
-		return true, user.Username
-	}
-	return false, ""
+	return ok, user
 }
 
 func logOut(writer http.ResponseWriter, request *http.Request) bool {

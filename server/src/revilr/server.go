@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"encoding/gob"
 	"net/http"
 	"regexp"
@@ -40,12 +41,8 @@ func httpHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	if request.Method == "POST" {
-		success = postHandler(request, revilType)
-		if success {
-			http.Redirect(writer, request, "/revilr", http.StatusFound)
-		} else {
-			http.NotFound(writer, request)
-		}
+		postHandler(request, revilType)
+		http.Redirect(writer, request, "/revilr", http.StatusFound)
 	} else if request.Method == "GET" {
 		getHandler(writer, request, revilType)
 	}
@@ -59,21 +56,41 @@ func parseType(request *http.Request) (string, bool) {
 	return revilType, validTypes.MatchString(revilType)
 }
 
-func postHandler(request *http.Request, revilType string) bool {
+func postHandler(request *http.Request, revilType string) {
 	rev := user.Revil{Type: revilType, Url: request.FormValue("url"), Comment: request.FormValue("c")}
-	rev.PrintRevil()
-	db.InsertIntoDatabase(rev)
-	return true
+	loggedIn, user := getUser(request)
+	if loggedIn {
+		rev.PrintRevil()
+		err := db.InsertIntoDatabase(rev, user)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("Revild ", rev)
+		}
+	} else {
+		fmt.Println("Failed to revil", rev)
+	}
 }
 
 func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
-	revils := db.GetRevilsOfType(revilType)
-	DisplayRevils(revils, revilType, writer, request)
+	loggedIn, user := getUser(request)
+	if loggedIn {
+		revils := db.GetRevilsOfType(revilType, user)
+		DisplayRevils(revils, revilType, writer, request)
+	} else {
+		http.Redirect(writer, request, "/login", http.StatusFound)
+	}
+
 }
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
-	revils := db.GetAllRevilsInDatabase()
-	DisplayRevils(revils, "all", writer, request)
+	loggedIn, user := getUser(request)
+	if !loggedIn {
+		http.Redirect(writer, request, "/login", http.StatusFound)
+	} else {
+		revils := db.GetAllRevilsInDatabase(user)
+		DisplayRevils(revils, "all", writer, request)
+	}	
 }
 
 func loginHandler(writer http.ResponseWriter, request *http.Request) {
@@ -123,7 +140,7 @@ func verifyUser(username string) *user.User {
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
-	loggedIn := getLoggedIn(request)
+	loggedIn, _ := getUser(request)
 
 	if loggedIn {
 		DisplayUser(writer, request)

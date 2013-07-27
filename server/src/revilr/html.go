@@ -99,12 +99,12 @@ func getMapForRevil(rev user.Revil) map[string]interface{} {
 }
 
 func getNavbar(revilType string, request *http.Request) string {
-	loggedIn, username := getUsername(request)
+	loggedIn, user := getUser(request)
 	data := make(map[string]interface{})
 	data[revilType] = true
 	data["loggedIn"] = loggedIn
 	if loggedIn {
-		data["username"] = username
+		data["username"] = user.Username
 	}
 	html := navbar.Render(data)
 
