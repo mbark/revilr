@@ -36,7 +36,7 @@ func main() {
 func httpHandler(writer http.ResponseWriter, request *http.Request) {
 	loggedIn, usr := getUser(request)
 	if !loggedIn {
-		http.Redirect(writer, request, "/login", http.StatusFound)
+		http.Redirect(writer, request, "/login", http.StatusMovedPermanently)
 	}
 
 	revilType, success := parseType(request)
@@ -47,7 +47,7 @@ func httpHandler(writer http.ResponseWriter, request *http.Request) {
 
 	if request.Method == "POST" {
 		postHandler(request, revilType, usr)
-		http.Redirect(writer, request, "/revilr", http.StatusFound)
+		http.Redirect(writer, request, "/revilr", http.StatusTemporaryRedirect)
 	} else if request.Method == "GET" {
 		getHandler(writer, request, revilType, usr)
 	}
@@ -81,7 +81,7 @@ func getHandler(writer http.ResponseWriter, request *http.Request, revilType str
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	loggedIn, user := getUser(request)
 	if !loggedIn {
-		http.Redirect(writer, request, "/login", http.StatusFound)
+		http.Redirect(writer, request, "/login", http.StatusMovedPermanently)
 	} else {
 		revils := db.GetAllRevilsInDatabase(user)
 		DisplayRevils(revils, "all", writer, request)
@@ -92,7 +92,7 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 	session := getSession(request)
 
 	if session.Values["user"] != nil {
-		http.Redirect(writer, request, "/user", http.StatusFound)
+		http.Redirect(writer, request, "/user", http.StatusTemporaryRedirect)
 	}
 
 	if request.Method == "POST" {
@@ -109,7 +109,7 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 			session.Values["user"] = user
 			err := session.Save(request, writer)
 			if err == nil {
-				http.Redirect(writer, request, "/user", http.StatusFound)
+				http.Redirect(writer, request, "/user", http.StatusMovedPermanently)
 			} else {
 				panic(err)
 			}
@@ -140,7 +140,7 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 	if loggedIn {
 		DisplayUser(writer, request)
 	} else {
-		http.Redirect(writer, request, "/login", http.StatusFound)
+		http.Redirect(writer, request, "/login", http.StatusMovedPermanently)
 	}
 }
 
@@ -161,13 +161,17 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 		user.SetPassword(password)
 		err := db.CreateUser(user)
 
-		if err != nil {
-			DisplayRegister(writer, "failed", request)
-			return
+		if err == nil {
+			session := getSession(request)
+			session.Values["user"] = user
+			err := session.Save(request, writer)
+			if err == nil {
+				http.Redirect(writer, request, "/user", http.StatusTemporaryRedirect)
+				return
+			}
 		}
 
-		http.Redirect(writer, request, "/user", http.StatusFound)
-		return
+		DisplayRegister(writer, "failed", request)
 	} else if request.Method == "GET" {
 		DisplayRegister(writer, "", request)
 	}

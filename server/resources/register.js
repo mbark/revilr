@@ -1,7 +1,7 @@
 function validateForm() {
 	var username = document.register.username;
-	var password1 = document.register.pwd1;
-	var password2 = document.register.pwd2;
+	var password1 = document.register.password;
+	var password2 = document.register.password2;
 
 	if(!isUsernameValid(username, 5, 12)) {
 		return false;
@@ -17,7 +17,10 @@ function validateForm() {
 }
 
 function isUsernameValid(username, min, max) {
-	var length = username.value.length;
+	var length = 0;
+	if(username.value != undefined) {
+		length = username.value.length;
+	}
 	if (length == 0) {
 		alert("Username can not be empty!");
 	} else if(length > max || length < min) {
