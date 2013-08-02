@@ -121,17 +121,13 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func parseUser(request *http.Request) (username, password string) {
-	username = request.FormValue("username")
-	password = request.FormValue("password")
-	return
-}
-
 func registerHandler(writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
-		tmp, _ := verifyUser(request)
-		if tmp == nil {
-			username, password := parseUser(request)
+		valid := verifyRegister(request)
+		if valid {
+			username := request.FormValue("username")
+			password := request.FormValue("password")
+
 			user := &user.User{Username: username}
 			user.SetPassword(password)
 			err := db.CreateUser(user)
@@ -143,10 +139,33 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 					return
 				}
 			}
+		} else {
+			http.NotFound(writer, request)
 		}
 	} else if request.Method == "GET" {
 		DisplayRegister(writer, request)
 	}
+}
+
+func verifyRegister(request *http.Request) bool {
+	username := request.FormValue("username")
+	password := request.FormValue("password")
+	verification := request.FormValue("password2")
+
+	if len(username) < 5 || len(username) > 12 {
+		return false
+	}
+	if len(password) < 8 {
+		return false
+	}
+	if password != verification {
+		return false
+	}
+	if tmp, _ := verifyUser(request); tmp != nil {
+		return false
+	}
+
+	return true
 }
 
 func login(writer http.ResponseWriter, request *http.Request, user *user.User) error {
@@ -191,7 +210,9 @@ func isValidUserHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func verifyUser(request *http.Request) (*user.User, bool) {
-	username, password := parseUser(request)
+	username := request.FormValue("username")
+	password := request.FormValue("password")
+
 	if username != "" {
 		user, err := db.FindUser(username)
 		if err == nil {
