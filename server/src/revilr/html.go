@@ -10,7 +10,7 @@ import (
 var layout = parseFile("resources/html/layout.html")
 var navbar = parseFile("resources/html/navbar.html")
 var display = parseFile("resources/html/display.html")
-var login = parseFile("resources/html/login.html")
+var loginTmpl = parseFile("resources/html/login.html")
 var logout = parseFile("resources/html/logout.html")
 var userUrl = parseFile("resources/html/user.html")
 var register = parseFile("resources/html/register.html")
@@ -35,7 +35,7 @@ func DisplayRevils(revils []user.Revil, revilType string, writer http.ResponseWr
 func DisplayLogin(writer http.ResponseWriter, request *http.Request) {
 	data := make(map[string]interface{})
 	data["navbar"] = getNavbar("login", request)
-	html := login.RenderInLayout(layout, data)
+	html := loginTmpl.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
 }

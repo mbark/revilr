@@ -99,38 +99,16 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	if request.Method == "POST" {
-		username, password := parseUser(request)
+		user, canLogin := verifyUser(request)
 
-		user := verifyUser(username)
-		if user != nil {
-
-			loggedIn := user.Login(password)
-			if loggedIn {
-				session.Values["user"] = user
-				err := session.Save(request, writer)
-				if err == nil {
-					http.Redirect(writer, request, "/user", http.StatusMovedPermanently)
-				} else {
-					panic(err)
-				}
-
+		if user != nil && canLogin {
+			if login(writer, request, user) == nil {
+				http.Redirect(writer, request, "/user", http.StatusMovedPermanently)
 			}
 		}
 	} else if request.Method == "GET" {
 		DisplayLogin(writer, request)
 	}
-}
-
-func verifyUser(username string) *user.User {
-	if username != "" {
-		user, err := db.FindUser(username)
-		if err == nil {
-			if user.Username != "" {
-				return user
-			}
-		}
-	}
-	return nil
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
@@ -151,16 +129,15 @@ func parseUser(request *http.Request) (username, password string) {
 
 func registerHandler(writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
-		username, password := parseUser(request)
-		if verifyUser(username) == nil {
+		tmp, _ := verifyUser(request)
+		if tmp == nil {
+			username, password := parseUser(request)
 			user := &user.User{Username: username}
 			user.SetPassword(password)
 			err := db.CreateUser(user)
 
 			if err == nil {
-				session := getSession(request)
-				session.Values["user"] = user
-				err := session.Save(request, writer)
+				err = login(writer, request, user)
 				if err == nil {
 					http.Redirect(writer, request, "/user", http.StatusTemporaryRedirect)
 					return
@@ -170,6 +147,13 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 	} else if request.Method == "GET" {
 		DisplayRegister(writer, request)
 	}
+}
+
+func login(writer http.ResponseWriter, request *http.Request, user *user.User) error {
+	session := getSession(request)
+	session.Values["user"] = user
+	err := session.Save(request, writer)
+	return err
 }
 
 func logoutHandler(writer http.ResponseWriter, request *http.Request) {
@@ -187,8 +171,7 @@ func revilHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func userTakenHandler(writer http.ResponseWriter, request *http.Request) {
-	username := request.FormValue("username")
-	user := verifyUser(username)
+	user, _ := verifyUser(request)
 	isTaken := user != nil
 
 	writer.Header().Set("Content-Type", "application/json")
@@ -197,19 +180,28 @@ func userTakenHandler(writer http.ResponseWriter, request *http.Request) {
 
 func isValidUserHandler(writer http.ResponseWriter, request *http.Request) {
 	isValid := false
+	user, canLogin := verifyUser(request)
 
-	username, password := parseUser(request)
-	user := verifyUser(username)
-
-	if user != nil {
-		canLogin := user.Login(password)
-		if canLogin {
-			isValid = true
-		}
+	if user != nil && canLogin {
+		isValid = true
 	}
 
 	writer.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(writer, Response{"isValid": isValid})
+}
+
+func verifyUser(request *http.Request) (*user.User, bool) {
+	username, password := parseUser(request)
+	if username != "" {
+		user, err := db.FindUser(username)
+		if err == nil {
+			if user.Username != "" {
+				canLogin := user.PasswordMatches(password)
+				return user, canLogin
+			}
+		}
+	}
+	return nil, false
 }
 
 type Response map[string]interface{}

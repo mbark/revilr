@@ -22,7 +22,7 @@ func (u *User) SetPassword(password string) error {
 	return nil
 }
 
-func (user *User) Login(password string) bool {
+func (user *User) PasswordMatches(password string) bool {
 	err := bcrypt.CompareHashAndPassword(user.Password, []byte(password))
 	return (err == nil)
 }
