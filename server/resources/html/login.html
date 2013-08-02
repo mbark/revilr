@@ -8,13 +8,17 @@
         <input type="text" name="username" id="username" placeholder="Username">
       </div>
     </div>
-    {{#invalidUsername}}<span class="help-inline">Incorrect username</span>{{/invalidUsername}}
     <div class="control-group {{#failed}}error{{/failed}}">
       <label class="control-label" for="password">Password</label>
       <div class="controls">
         <input type="password" name="password" id="password" placeholder="Password">
       </div>
-      {{#invalidPassword}}<span class="help-inline">Incorrect password</span>{{/invalidPassword}}
+      {{#error}}
+      <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        Invalid username or password!
+      </div>
+      {{/error}}
     </div>
     <div class="control-group">
       <div class="controls">

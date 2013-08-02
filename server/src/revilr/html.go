@@ -32,10 +32,12 @@ func DisplayRevils(revils []user.Revil, revilType string, writer http.ResponseWr
 	fmt.Fprintf(writer, html)
 }
 
-func DisplayLogin(writer http.ResponseWriter, success string, request *http.Request) {
+func DisplayLogin(writer http.ResponseWriter, success bool, request *http.Request) {
 	data := make(map[string]interface{})
 	data["navbar"] = getNavbar("login", request)
-	data[success] = true
+	if !success {
+		data["error"] = true
+	}
 	html := login.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
@@ -58,10 +60,9 @@ func DisplayUser(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprintf(writer, html)
 }
 
-func DisplayRegister(writer http.ResponseWriter, success string, request *http.Request) {
+func DisplayRegister(writer http.ResponseWriter, request *http.Request) {
 	data := make(map[string]interface{})
 	data["navbar"] = getNavbar("register", request)
-	data[success] = true
 	html := register.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)

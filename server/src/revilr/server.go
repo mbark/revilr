@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/gob"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -29,6 +30,7 @@ func main() {
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/logout", logoutHandler)
 	http.HandleFunc("/revil", revilHandler)
+	http.HandleFunc("/user_taken", userTakenHandler)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
 	http.ListenAndServe(":8080", nil)
 }
@@ -100,7 +102,7 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 
 		user := verifyUser(username)
 		if user == nil {
-			DisplayLogin(writer, "invalidUsername", request)
+			DisplayLogin(writer, false, request)
 			return
 		}
 
@@ -115,10 +117,10 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 			}
 
 		} else {
-			DisplayLogin(writer, "invalidPassword", request)
+			DisplayLogin(writer, false, request)
 		}
 	} else if request.Method == "GET" {
-		DisplayLogin(writer, "", request)
+		DisplayLogin(writer, true, request)
 	}
 }
 
@@ -153,27 +155,23 @@ func parseUser(request *http.Request) (username, password string) {
 func registerHandler(writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
 		username, password := parseUser(request)
-		if verifyUser(username) != nil {
-			DisplayRegister(writer, "usernameTaken", request)
-			return
-		}
-		user := &user.User{Username: username}
-		user.SetPassword(password)
-		err := db.CreateUser(user)
+		if verifyUser(username) == nil {
+			user := &user.User{Username: username}
+			user.SetPassword(password)
+			err := db.CreateUser(user)
 
-		if err == nil {
-			session := getSession(request)
-			session.Values["user"] = user
-			err := session.Save(request, writer)
 			if err == nil {
-				http.Redirect(writer, request, "/user", http.StatusTemporaryRedirect)
-				return
+				session := getSession(request)
+				session.Values["user"] = user
+				err := session.Save(request, writer)
+				if err == nil {
+					http.Redirect(writer, request, "/user", http.StatusTemporaryRedirect)
+					return
+				}
 			}
 		}
-
-		DisplayRegister(writer, "failed", request)
 	} else if request.Method == "GET" {
-		DisplayRegister(writer, "", request)
+		DisplayRegister(writer, request)
 	}
 }
 
@@ -189,4 +187,25 @@ func revilHandler(writer http.ResponseWriter, request *http.Request) {
 	} else {
 		DisplayRevil(writer, request)
 	}
+}
+
+func userTakenHandler(writer http.ResponseWriter, request *http.Request) {
+	username := request.FormValue("username")
+	user := verifyUser(username)
+	isTaken := user != nil
+
+	writer.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(writer, Response{"isTaken": isTaken})
+}
+
+type Response map[string]interface{}
+
+func (r Response) String() (s string) {
+	b, err := json.Marshal(r)
+	if err != nil {
+		s = ""
+		return
+	}
+	s = string(b)
+	return
 }

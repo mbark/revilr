@@ -6,6 +6,9 @@ function validateForm() {
 	if(!isUsernameValid(username, 5, 12)) {
 		return false;
 	}
+	if(!isUsernameFree(username)) {
+		return false;
+	}
 	if(!isPasswordValid(password1, 8)) {
 		return false;
 	}
@@ -30,6 +33,31 @@ function isUsernameValid(username, min, max) {
 	}
 	username.focus();
 	return false;
+}
+
+function isUsernameFree(username) {
+	var name = username.value;
+	var isTaken = false;
+
+	$.ajax({
+		type: 'POST',
+		url: "/user_taken",
+		data: {
+			username: name
+		},
+		success: function(data) {
+			isTaken = data.isTaken;
+		},
+		async: false
+	});
+
+	if(isTaken) {
+		alert("Username is taken");
+		username.focus();
+		return false;
+	}
+
+	return true;
 }
 
 function isPasswordValid(password, min) {
