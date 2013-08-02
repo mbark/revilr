@@ -42,6 +42,7 @@ function isUsernameFree(username) {
 	$.ajax({
 		type: 'POST',
 		url: "/user_taken",
+		dataType: "json",
 		data: {
 			username: name
 		},

@@ -31,6 +31,7 @@ func main() {
 	http.HandleFunc("/logout", logoutHandler)
 	http.HandleFunc("/revil", revilHandler)
 	http.HandleFunc("/user_taken", userTakenHandler)
+	http.HandleFunc("/user_valid", isValidUserHandler)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
 	http.ListenAndServe(":8080", nil)
 }
@@ -101,26 +102,22 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 		username, password := parseUser(request)
 
 		user := verifyUser(username)
-		if user == nil {
-			DisplayLogin(writer, false, request)
-			return
-		}
+		if user != nil {
 
-		loggedIn := user.Login(password)
-		if loggedIn {
-			session.Values["user"] = user
-			err := session.Save(request, writer)
-			if err == nil {
-				http.Redirect(writer, request, "/user", http.StatusMovedPermanently)
-			} else {
-				panic(err)
+			loggedIn := user.Login(password)
+			if loggedIn {
+				session.Values["user"] = user
+				err := session.Save(request, writer)
+				if err == nil {
+					http.Redirect(writer, request, "/user", http.StatusMovedPermanently)
+				} else {
+					panic(err)
+				}
+
 			}
-
-		} else {
-			DisplayLogin(writer, false, request)
 		}
 	} else if request.Method == "GET" {
-		DisplayLogin(writer, true, request)
+		DisplayLogin(writer, request)
 	}
 }
 
@@ -196,6 +193,23 @@ func userTakenHandler(writer http.ResponseWriter, request *http.Request) {
 
 	writer.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(writer, Response{"isTaken": isTaken})
+}
+
+func isValidUserHandler(writer http.ResponseWriter, request *http.Request) {
+	isValid := false
+
+	username, password := parseUser(request)
+	user := verifyUser(username)
+
+	if user != nil {
+		canLogin := user.Login(password)
+		if canLogin {
+			isValid = true
+		}
+	}
+
+	writer.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(writer, Response{"isValid": isValid})
 }
 
 type Response map[string]interface{}

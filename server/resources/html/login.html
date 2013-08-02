@@ -1,24 +1,18 @@
 {{{navbar}}}
 
 <div id="main">
-  <form action="/login" method="POST" class="form-horizontal">
+  <form name="login" action="/login" method="POST" onsubmit="return validateForm()" class="form-horizontal">
     <div class="control-group">
       <label class="control-label" for="username">Username</label>
       <div class="controls">
         <input type="text" name="username" id="username" placeholder="Username">
       </div>
     </div>
-    <div class="control-group {{#failed}}error{{/failed}}">
+    <div class="control-group">
       <label class="control-label" for="password">Password</label>
       <div class="controls">
         <input type="password" name="password" id="password" placeholder="Password">
       </div>
-      {{#error}}
-      <div class="alert alert-warning">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        Invalid username or password!
-      </div>
-      {{/error}}
     </div>
     <div class="control-group">
       <div class="controls">
@@ -27,3 +21,4 @@
     </div>
   </form>
 </div>
+<script src="/resources/login.js"></script>
