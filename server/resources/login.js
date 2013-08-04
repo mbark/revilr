@@ -20,7 +20,7 @@ $("#login").submit(function() {
 
 	if(!isValid) {
 		$("#password-group").addClass("error");
-		$("#password-error").text("Invalid username or password");
+		$("#password-error-text").text("Invalid username or password");
 		$("#password-error").show();
 	} else {
 		$("#password-group").removeClass("error");

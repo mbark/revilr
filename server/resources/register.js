@@ -24,12 +24,12 @@ function isUsernameValid() {
 
 	if(isIncorrectLength(username, 5, 20)) {
 		$("#username-group").addClass("error");
-		$("#username-error").text("Username have a length of between " + minLength + " and " + maxLength + " characters");
+		$("#username-error-text").text("Username have a length of between " + minLength + " and " + maxLength + " characters");
 		$("#username-error").show();
 		return false;
 	} else if(isUsernameTaken(username)) {
 		$("#username-group").addClass("error");
-		$("#username-error").text("Username is already taken");
+		$("#username-error-text").text("Username is already taken");
 		$("#username-error").show();
 		return false;
 	} else {
@@ -43,7 +43,7 @@ function isPasswordValid() {
 	var minLength = 8;
 	if(isIncorrectLength(password, 8, -1)) {
 		$("#password-group").addClass("error");
-		$("#password-error").text("Password must be " + minLength + " characters or longer");
+		$("#password-error-text").text("Password must be " + minLength + " characters or longer");
 		$("#password-error").show();
 		return false;
 	} else {
@@ -57,7 +57,7 @@ function isVerificationValid() {
 	var minLength = 8;
 	if(isNotSame(password, verification)) {
 		$("#verification-group").addClass("error");
-		$("#verification-error").text("Passwords do not match");
+		$("#verification-error-text").text("Passwords do not match");
 		$("#verification-error").show();
 		return false;
 	} else {
