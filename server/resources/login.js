@@ -1,4 +1,4 @@
-function validateForm() {
+$("#login").submit(function() {
 	var name = document.login.username.value;
 	var pass = document.login.password.value;
 
@@ -19,9 +19,13 @@ function validateForm() {
 	});
 
 	if(!isValid) {
-		alert("Invalid username or password");
-		password.focus();
+		$("#password-group").addClass("error");
+		$("#password-error").text("Invalid username or password");
+		$("#password-error").show();
+	} else {
+		$("#password-group").removeClass("error");
+		$("#password-error").hide();
 	}
 
 	return isValid;
-}
+});

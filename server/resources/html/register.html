@@ -1,28 +1,31 @@
 {{{navbar}}}
 
 <div id="main">
-  <form method="POST" action="/register" onsubmit="return validateForm()" name="register" class="form-horizontal">
-    <div class="control-group">
+  <form id="register" method="POST" action="/register" name="register" class="form-horizontal">
+    <div id="username-group" class="control-group">
       <label class="control-label" for="username">Username</label>
       <div class="controls">
         <input type="text" name="username" id="username" placeholder="Username">
+        <span id="username-error" class="help-inline"></span>
       </div>
     </div>
-    <div class="control-group">
+    <div id="password-group" class="control-group">
       <label class="control-label" for="password">Password</label>
       <div class="controls">
         <input type="password" name="password" id="password" placeholder="Password">
+        <span id="password-error" class="help-inline"></span>
       </div>
     </div>
-    <div class="control-group">
+    <div id="verification-group" class="control-group">
       <label class="control-label" for="password2">Retype password</label>
       <div class="controls">
-        <input type="password" name="password2" id="password2" placeholder="Password">
+        <input type="password" name="verification" id="verification" placeholder="Password">
+        <span id="verification-error" class="help-inline"></span>
       </div>
     </div>
     <div class="control-group">
       <div class="controls">
-        <button type="submit" class="btn">Sign in</button>
+        <button type="submit" class="btn">Register</button>
       </div>
     </div>
   </form>

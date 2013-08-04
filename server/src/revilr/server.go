@@ -150,7 +150,7 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 func verifyRegister(request *http.Request) bool {
 	username := request.FormValue("username")
 	password := request.FormValue("password")
-	verification := request.FormValue("password2")
+	verification := request.FormValue("verification")
 
 	if len(username) < 5 || len(username) > 12 {
 		return false
