@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
-	"revilr/db"
 	"revilr/data"
+	"revilr/db"
 )
 
 const lenPath = len("/revilr/")
@@ -15,11 +15,7 @@ const lenPath = len("/revilr/")
 var validTypes = regexp.MustCompile("^(page|image|selection)$")
 
 func main() {
-	db, err := db.OpenConnection()
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+	db.OpenConnection()
 
 	gob.Register(data.User{})
 
@@ -66,18 +62,16 @@ func parseType(request *http.Request) (string, bool) {
 
 func postHandler(request *http.Request, revilType string, usr data.User) {
 	rev := data.Revil{Type: revilType, Url: request.FormValue("url"), Comment: request.FormValue("c")}
-	rev.PrintRevil()
-	err := db.InsertIntoDatabase(rev, usr)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("Revild ", rev)
-	}
-
+	db.InsertIntoDatabase(rev, usr)
+	rev.Print()
 }
 
 func getHandler(writer http.ResponseWriter, request *http.Request, revilType string, usr data.User) {
-	revils := db.GetRevilsOfType(revilType, usr)
+	revils, err := db.GetRevilsOfType(revilType, usr)
+	if err != nil {
+		fmt.Println(err)
+		revils = make([]data.Revil, 0)
+	}
 	DisplayRevils(revils, revilType, writer, request)
 }
 
@@ -86,7 +80,11 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	if !loggedIn {
 		http.Redirect(writer, request, "/login", http.StatusMovedPermanently)
 	} else {
-		revils := db.GetAllRevilsInDatabase(user)
+		revils, err := db.GetAllRevilsInDatabase(user)
+		if err != nil {
+			fmt.Println(err)
+			revils = make([]data.Revil, 0)
+		}
 		DisplayRevils(revils, "all", writer, request)
 	}
 }
@@ -130,21 +128,16 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 
 			user, err := data.CreateUser(username, password)
 
-			if err != nil {
-				err := db.CreateUser(user)
-
 			if err == nil {
+				db.CreateUser(*user)
 				err = login(writer, request, user)
 				if err == nil {
 					http.Redirect(writer, request, "/user", http.StatusTemporaryRedirect)
 					return
 				}
 			}
-			}
-			
-		} else {
-			http.NotFound(writer, request)
 		}
+		http.NotFound(writer, request)
 	} else if request.Method == "GET" {
 		DisplayRegister(writer, request)
 	}

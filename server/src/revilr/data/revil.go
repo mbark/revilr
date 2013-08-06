@@ -17,7 +17,7 @@ func (r Revil) toString() string {
 	return result
 }
 
-func (r Revil) PrintRevil() {
+func (r Revil) Print() {
 	fmt.Println(r.toString())
 }
 
@@ -26,13 +26,12 @@ func (rev Revil) AsMap() map[string]interface{} {
 
 	data["url"] = rev.Url
 	data["comment"] = rev.Comment
-	data["date"] = rev.Date
+	data["date"] = rev.Created
 	data["display-url"] = rev.parseUrl()
 	data["type"] = rev.Type
 
 	return data
 }
-
 
 func (rev Revil) parseUrl() string {
 	parsed, err := url.Parse(rev.Url)
