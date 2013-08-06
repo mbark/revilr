@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/hoisie/mustache"
 	"net/http"
-	"revilr/user"
+	"revilr/data"
 )
 
 var layout = parseFile("resources/html/layout.html")
@@ -24,7 +24,7 @@ func parseFile(file string) *mustache.Template {
 	return tmpl
 }
 
-func DisplayRevils(revils []user.Revil, revilType string, writer http.ResponseWriter, request *http.Request) {
+func DisplayRevils(revils []data.Revil, revilType string, writer http.ResponseWriter, request *http.Request) {
 	data := formatRevilsForOutput(revils, revilType)
 	data["navbar"] = getNavbar(revilType, request)
 	html := display.RenderInLayout(layout, data)
@@ -73,13 +73,13 @@ func DisplayRevil(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprintf(writer, html)
 }
 
-func formatRevilsForOutput(revils []user.Revil, revilType string) map[string]interface{} {
+func formatRevilsForOutput(revils []data.Revil, revilType string) map[string]interface{} {
 	values := make(map[string]interface{})
 	values["revils"] = getListOfRevilMaps(revils)
 	return values
 }
 
-func getListOfRevilMaps(revils []user.Revil) []map[string]interface{} {
+func getListOfRevilMaps(revils []data.Revil) []map[string]interface{} {
 	revilMaps := make([]map[string]interface{}, len(revils))
 
 	for key, rev := range revils {
@@ -89,7 +89,7 @@ func getListOfRevilMaps(revils []user.Revil) []map[string]interface{} {
 	return revilMaps
 }
 
-func getMapForRevil(rev user.Revil) map[string]interface{} {
+func getMapForRevil(rev data.Revil) map[string]interface{} {
 	dataType := make(map[string]interface{})
 	dataType[rev.Type] = rev.AsMap()
 

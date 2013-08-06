@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/sessions"
 	"net/http"
-	"revilr/user"
+	"revilr/data"
 )
 
 var store = sessions.NewCookieStore([]byte("this-is-a-secret"))
@@ -19,8 +19,8 @@ func getSession(request *http.Request) *sessions.Session {
 	return session
 }
 
-func getUser(request *http.Request) (bool, user.User) {
-	user, ok := getSession(request).Values["user"].(user.User)
+func getUser(request *http.Request) (bool, data.User) {
+	user, ok := getSession(request).Values["user"].(data.User)
 	return ok, user
 }
 

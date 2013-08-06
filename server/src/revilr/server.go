@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"regexp"
 	"revilr/db"
-	"revilr/user"
+	"revilr/data"
 )
 
 const lenPath = len("/revilr/")
@@ -21,7 +21,7 @@ func main() {
 	}
 	defer db.Close()
 
-	gob.Register(user.User{})
+	gob.Register(data.User{})
 
 	http.HandleFunc("/revilr/", httpHandler)
 	http.HandleFunc("/revilr", indexHandler)
@@ -64,8 +64,8 @@ func parseType(request *http.Request) (string, bool) {
 	return revilType, validTypes.MatchString(revilType)
 }
 
-func postHandler(request *http.Request, revilType string, usr user.User) {
-	rev := user.Revil{Type: revilType, Url: request.FormValue("url"), Comment: request.FormValue("c")}
+func postHandler(request *http.Request, revilType string, usr data.User) {
+	rev := data.Revil{Type: revilType, Url: request.FormValue("url"), Comment: request.FormValue("c")}
 	rev.PrintRevil()
 	err := db.InsertIntoDatabase(rev, usr)
 	if err != nil {
@@ -76,7 +76,7 @@ func postHandler(request *http.Request, revilType string, usr user.User) {
 
 }
 
-func getHandler(writer http.ResponseWriter, request *http.Request, revilType string, usr user.User) {
+func getHandler(writer http.ResponseWriter, request *http.Request, revilType string, usr data.User) {
 	revils := db.GetRevilsOfType(revilType, usr)
 	DisplayRevils(revils, revilType, writer, request)
 }
@@ -128,9 +128,10 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 			username := request.FormValue("username")
 			password := request.FormValue("password")
 
-			user := &user.User{Username: username}
-			user.SetPassword(password)
-			err := db.CreateUser(user)
+			user, err := data.CreateUser(username, password)
+
+			if err != nil {
+				err := db.CreateUser(user)
 
 			if err == nil {
 				err = login(writer, request, user)
@@ -139,6 +140,8 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 					return
 				}
 			}
+			}
+			
 		} else {
 			http.NotFound(writer, request)
 		}
@@ -168,7 +171,7 @@ func verifyRegister(request *http.Request) bool {
 	return true
 }
 
-func login(writer http.ResponseWriter, request *http.Request, user *user.User) error {
+func login(writer http.ResponseWriter, request *http.Request, user *data.User) error {
 	session := getSession(request)
 	session.Values["user"] = user
 	err := session.Save(request, writer)
@@ -209,7 +212,7 @@ func isValidUserHandler(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprint(writer, Response{"isValid": isValid})
 }
 
-func verifyUser(request *http.Request) (*user.User, bool) {
+func verifyUser(request *http.Request) (*data.User, bool) {
 	username := request.FormValue("username")
 	password := request.FormValue("password")
 

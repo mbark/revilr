@@ -1,16 +1,9 @@
-package user
+package data
 
 import (
 	"fmt"
 	"net/url"
 )
-
-type Revil struct {
-	Type    string
-	Url     string
-	Comment string
-	Date    string
-}
 
 func (r Revil) toString() string {
 	var result string
@@ -34,17 +27,16 @@ func (rev Revil) AsMap() map[string]interface{} {
 	data["url"] = rev.Url
 	data["comment"] = rev.Comment
 	data["date"] = rev.Date
-	data["display-url"] = parseUrl(rev)
+	data["display-url"] = rev.parseUrl()
 	data["type"] = rev.Type
 
 	return data
 }
 
 
-func parseUrl(rev Revil) string {
+func (rev Revil) parseUrl() string {
 	parsed, err := url.Parse(rev.Url)
 	if err != nil {
-		//fmt.Println(err)
 		return rev.Url
 	}
 
