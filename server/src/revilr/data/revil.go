@@ -2,8 +2,14 @@ package data
 
 import (
 	"fmt"
+	"labix.org/v2/mgo/bson"
 	"net/url"
 )
+
+func CreateRevil(revilType, url, comment string) (rev Revil) {
+	rev = Revil{Id: bson.NewObjectId(), Type: revilType, Url: url, Comment: comment, Created: bson.Now()}
+	return
+}
 
 func (r Revil) toString() string {
 	var result string

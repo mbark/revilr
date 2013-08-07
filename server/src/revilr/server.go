@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -17,8 +16,6 @@ var validTypes = regexp.MustCompile("^(page|image|selection)$")
 func main() {
 	db.OpenConnection()
 
-	gob.Register(data.User{})
-
 	http.HandleFunc("/revilr/", httpHandler)
 	http.HandleFunc("/revilr", indexHandler)
 	http.HandleFunc("/user", userHandler)
@@ -33,7 +30,7 @@ func main() {
 }
 
 func httpHandler(writer http.ResponseWriter, request *http.Request) {
-	loggedIn, usr := getUser(request)
+	loggedIn := isLoggedIn(request)
 	if !loggedIn {
 		http.Redirect(writer, request, "/login", http.StatusMovedPermanently)
 	}
@@ -45,10 +42,10 @@ func httpHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	if request.Method == "POST" {
-		postHandler(request, revilType, usr)
+		postHandler(request, revilType)
 		http.Redirect(writer, request, "/revilr", http.StatusTemporaryRedirect)
 	} else if request.Method == "GET" {
-		getHandler(writer, request, revilType, usr)
+		getHandler(writer, request, revilType)
 	}
 }
 
@@ -60,14 +57,26 @@ func parseType(request *http.Request) (string, bool) {
 	return revilType, validTypes.MatchString(revilType)
 }
 
-func postHandler(request *http.Request, revilType string, usr data.User) {
-	rev := data.Revil{Type: revilType, Url: request.FormValue("url"), Comment: request.FormValue("c")}
-	db.InsertIntoDatabase(rev, usr)
-	rev.Print()
+func postHandler(request *http.Request, revilType string) {
+	url := request.FormValue("url")
+	comment := request.FormValue("c")
+	userId, ok := getUserId(request)
+	if !ok {
+		return
+	}
+
+	err := db.CreateRevil(userId, revilType, url, comment)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
-func getHandler(writer http.ResponseWriter, request *http.Request, revilType string, usr data.User) {
-	revils, err := db.GetRevilsOfType(revilType, usr)
+func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
+	user, ok := getUser(request)
+	if !ok {
+		return
+	}
+	revils, err := db.GetRevilsOfType(revilType, user)
 	if err != nil {
 		fmt.Println(err)
 		revils = make([]data.Revil, 0)
@@ -76,31 +85,34 @@ func getHandler(writer http.ResponseWriter, request *http.Request, revilType str
 }
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
-	loggedIn, user := getUser(request)
-	if !loggedIn {
+	if !isLoggedIn(request) {
 		http.Redirect(writer, request, "/login", http.StatusMovedPermanently)
 	} else {
-		revils, err := db.GetAllRevilsInDatabase(user)
-		if err != nil {
-			fmt.Println(err)
-			revils = make([]data.Revil, 0)
+		user, ok := getUser(request)
+		revils := make([]data.Revil, 0)
+		if ok {
+			allRevils, err := db.GetAllRevilsInDatabase(user)
+			if err != nil {
+				fmt.Println(err)
+			} else {
+				revils = allRevils
+			}
 		}
+
 		DisplayRevils(revils, "all", writer, request)
 	}
 }
 
 func loginHandler(writer http.ResponseWriter, request *http.Request) {
-	session := getSession(request)
-
-	if session.Values["user"] != nil {
+	if isLoggedIn(request) {
 		http.Redirect(writer, request, "/user", http.StatusTemporaryRedirect)
 	}
 
 	if request.Method == "POST" {
 		user, canLogin := verifyUser(request)
 
-		if user != nil && canLogin {
-			if login(writer, request, user) == nil {
+		if canLogin && user != nil {
+			if setUser(writer, request, *user) == nil {
 				http.Redirect(writer, request, "/user", http.StatusMovedPermanently)
 			}
 		}
@@ -110,7 +122,7 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
-	loggedIn, _ := getUser(request)
+	loggedIn := isLoggedIn(request)
 
 	if loggedIn {
 		DisplayUser(writer, request)
@@ -122,22 +134,26 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 func registerHandler(writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
 		valid := verifyRegister(request)
+
 		if valid {
 			username := request.FormValue("username")
 			password := request.FormValue("password")
 
-			user, err := data.CreateUser(username, password)
-
+			user, err := db.CreateUser(username, password)
 			if err == nil {
-				db.CreateUser(*user)
-				err = login(writer, request, user)
+				err = setUser(writer, request, user)
 				if err == nil {
 					http.Redirect(writer, request, "/user", http.StatusTemporaryRedirect)
 					return
+				} else {
+					fmt.Println(err)
 				}
+			} else {
+				fmt.Println(err)
 			}
+		} else {
+			fmt.Println("Invalid register")
 		}
-		http.NotFound(writer, request)
 	} else if request.Method == "GET" {
 		DisplayRegister(writer, request)
 	}
@@ -164,21 +180,18 @@ func verifyRegister(request *http.Request) bool {
 	return true
 }
 
-func login(writer http.ResponseWriter, request *http.Request, user *data.User) error {
-	session := getSession(request)
-	session.Values["user"] = user
-	err := session.Save(request, writer)
-	return err
-}
-
 func logoutHandler(writer http.ResponseWriter, request *http.Request) {
-	loggedIn := !logOut(writer, request)
-	DisplayLogout(writer, loggedIn, request)
+	err := logOut(writer, request)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		DisplayLogout(writer, request)
+	}
+
 }
 
 func revilHandler(writer http.ResponseWriter, request *http.Request) {
-	loggedIn, _ := getUser(request)
-	if !loggedIn {
+	if !isLoggedIn(request) {
 		http.Redirect(writer, request, "/login", http.StatusFound)
 	} else {
 		DisplayRevil(writer, request)
@@ -195,9 +208,9 @@ func userTakenHandler(writer http.ResponseWriter, request *http.Request) {
 
 func isValidUserHandler(writer http.ResponseWriter, request *http.Request) {
 	isValid := false
-	user, canLogin := verifyUser(request)
+	_, canLogin := verifyUser(request)
 
-	if user != nil && canLogin {
+	if canLogin {
 		isValid = true
 	}
 
@@ -209,16 +222,26 @@ func verifyUser(request *http.Request) (*data.User, bool) {
 	username := request.FormValue("username")
 	password := request.FormValue("password")
 
-	if username != "" {
-		user, err := db.FindUser(username)
-		if err == nil {
-			if user.Username != "" {
-				canLogin := user.PasswordMatches(password)
-				return user, canLogin
-			}
-		}
+	user, err := db.FindUserByName(username)
+	if err == nil && user != nil{
+		canLogin := user.PasswordMatches(password)
+		return user, canLogin
 	}
 	return nil, false
+}
+
+func getUser(request *http.Request) (user data.User, ok bool) {
+	userId, ok := getUserId(request)
+	if !ok {
+		return
+	}
+
+	userPointer, err := db.FindUserById(userId)
+	ok = err == nil
+	if userPointer != nil {
+		user = *userPointer
+	}
+	return
 }
 
 type Response map[string]interface{}

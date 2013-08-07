@@ -7,14 +7,16 @@ import (
 	"revilr/data"
 )
 
-var layout = parseFile("resources/html/layout.html")
-var navbar = parseFile("resources/html/navbar.html")
-var display = parseFile("resources/html/display.html")
-var loginTmpl = parseFile("resources/html/login.html")
-var logout = parseFile("resources/html/logout.html")
-var userUrl = parseFile("resources/html/user.html")
-var register = parseFile("resources/html/register.html")
-var revil = parseFile("resources/html/revil.html")
+var (
+	layout    = parseFile("resources/html/layout.html")
+	navbar    = parseFile("resources/html/navbar.html")
+	display   = parseFile("resources/html/display.html")
+	loginTmpl = parseFile("resources/html/login.html")
+	logout    = parseFile("resources/html/logout.html")
+	userUrl   = parseFile("resources/html/user.html")
+	register  = parseFile("resources/html/register.html")
+	revil     = parseFile("resources/html/revil.html")
+)
 
 func parseFile(file string) *mustache.Template {
 	tmpl, err := mustache.ParseFile(file)
@@ -40,10 +42,9 @@ func DisplayLogin(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprintf(writer, html)
 }
 
-func DisplayLogout(writer http.ResponseWriter, loggedIn bool, request *http.Request) {
+func DisplayLogout(writer http.ResponseWriter, request *http.Request) {
 	data := make(map[string]interface{})
 	data["navbar"] = getNavbar("logout", request)
-	data["loggedIn"] = loggedIn
 	html := logout.RenderInLayout(layout, data)
 
 	fmt.Fprintf(writer, html)
@@ -97,13 +98,15 @@ func getMapForRevil(rev data.Revil) map[string]interface{} {
 }
 
 func getNavbar(revilType string, request *http.Request) string {
-	loggedIn, user := getUser(request)
 	data := make(map[string]interface{})
 	data[revilType] = true
-	data["loggedIn"] = loggedIn
-	if loggedIn {
+	data["loggedIn"] = false
+
+	if user, ok := getUser(request); ok && isLoggedIn(request) {
 		data["username"] = user.Username
+		data["loggedIn"] = true
 	}
+
 	html := navbar.Render(data)
 
 	return html
