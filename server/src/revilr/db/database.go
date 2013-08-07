@@ -36,13 +36,13 @@ func CreateRevil(userId, revilType, url, comment string) error {
 
 func GetAllRevilsInDatabase(user data.User) (revils data.Revils, err error) {
 	collection := database.C(revilsC)
-	err = collection.Find(bson.M{"uid": user.Id}).All(&revils)
+	err = collection.Find(bson.M{"uid": user.Id}).Sort("-created").All(&revils)
 	return
 }
 
 func GetRevilsOfType(rtype string, user data.User) (revils data.Revils, err error) {
 	collection := database.C(revilsC)
-	err = collection.Find(bson.M{"type": rtype, "uid": user.Id}).All(&revils)
+	err = collection.Find(bson.M{"type": rtype, "uid": user.Id}).Sort("-created").All(&revils)
 	return
 }
 

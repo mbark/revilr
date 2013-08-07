@@ -26,6 +26,7 @@ func main() {
 	http.HandleFunc("/user_taken", userTakenHandler)
 	http.HandleFunc("/user_valid", isValidUserHandler)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
+
 	http.ListenAndServe(":8080", nil)
 }
 
@@ -223,7 +224,7 @@ func verifyUser(request *http.Request) (*data.User, bool) {
 	password := request.FormValue("password")
 
 	user, err := db.FindUserByName(username)
-	if err == nil && user != nil{
+	if err == nil && user != nil {
 		canLogin := user.PasswordMatches(password)
 		return user, canLogin
 	}
