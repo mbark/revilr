@@ -12,6 +12,7 @@ import (
 const lenPath = len("/revilr/")
 
 var validTypes = regexp.MustCompile("^(page|image|selection)$")
+var validEmail = regexp.MustCompile("([a-z]*.)+@[a-z]+.[a-z]+")
 
 func main() {
 	db.OpenConnection()
@@ -24,6 +25,7 @@ func main() {
 	http.HandleFunc("/logout", logoutHandler)
 	http.HandleFunc("/revil", revilHandler)
 	http.HandleFunc("/user_taken", userTakenHandler)
+	http.HandleFunc("/email_taken", emailTakenHandler)
 	http.HandleFunc("/user_valid", isValidUserHandler)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
 
@@ -136,13 +138,13 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 
 func registerHandler(writer http.ResponseWriter, request *http.Request) {
 	if request.Method == "POST" {
-		valid := verifyRegister(request)
-
-		if valid {
+		if isValidRegister(request) {
 			username := request.FormValue("username")
 			password := request.FormValue("password")
+			email := request.FormValue("email")
 
-			user, err := db.CreateUser(username, password)
+			user, err := db.CreateUser(username, password, email)
+			fmt.Println(user)
 			if err == nil {
 				err = setUser(writer, request, user)
 				if err == nil {
@@ -162,13 +164,17 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func verifyRegister(request *http.Request) bool {
+func isValidRegister(request *http.Request) bool {
 	username := request.FormValue("username")
 	password := request.FormValue("password")
 	verification := request.FormValue("verification")
+	email := request.FormValue("email")
 
 	if len(username) < 5 || len(username) > 12 {
 		return false
+	}
+	if !validEmail.MatchString(email) {
+		return false;
 	}
 	if len(password) < 8 {
 		return false
@@ -178,6 +184,9 @@ func verifyRegister(request *http.Request) bool {
 	}
 	if tmp, _ := verifyUser(request); tmp != nil {
 		return false
+	}
+	if tmp, _ := db.FindUserByEmail(email); tmp != nil {
+		return false;
 	}
 
 	return true
@@ -199,6 +208,15 @@ func revilHandler(writer http.ResponseWriter, request *http.Request) {
 	} else {
 		DisplayRevil(writer, request)
 	}
+}
+
+func emailTakenHandler(writer http.ResponseWriter, request *http.Request) {
+	email := request.FormValue("email")
+	user, _ := db.FindUserByEmail(email)
+	isTaken := user != nil
+
+	writer.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(writer, Response{"isTaken": isTaken})
 }
 
 func userTakenHandler(writer http.ResponseWriter, request *http.Request) {

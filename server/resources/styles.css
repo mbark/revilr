@@ -7,6 +7,10 @@
 	width: 800px;
 }
 
+#register {
+	width: 450px;
+}
+
 body {
 	background-image: url(/resources/kindajean.png);
 	background-repeat: repeat

@@ -7,12 +7,15 @@ import (
 )
 
 func CreateRevil(revilType, url, title, note string) (rev Revil) {
-	rev.Id = bson.NewObjectId()
-	rev.Created = bson.Now()
-	rev.Type = revilType
-	rev.Url = url
-	rev.Title = title
-	rev.Note = note
+	rev = Revil {
+		Id: bson.NewObjectId(),
+		Created: bson.Now(),
+		Type: revilType,
+		Url: url,
+		Title: title,
+		Note: note,
+	}
+	
 	return
 }
 

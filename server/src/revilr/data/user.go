@@ -5,9 +5,15 @@ import (
 	"labix.org/v2/mgo/bson"
 )
 
-func CreateUser(username string, password string) (user User, err error) {
+func CreateUser(username string, password, email string) (user User, err error) {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	user = User{Username: username, Password: hashedPass, Id: bson.NewObjectId(), Created: bson.Now()}
+	user = User {
+		Id: bson.NewObjectId(),
+		Username: username,
+		Email: email,
+		Password: hashedPass,
+		Created: bson.Now(),
+	}
 	return
 }
 

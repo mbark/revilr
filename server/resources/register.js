@@ -1,8 +1,11 @@
 var username = document.register.username;
+var email = document.register.email;
 var password = document.register.password;
 var verification = document.register.verification;
 
 $("#username").blur(isUsernameValid);
+
+$("#email").blur(isEmailValid);
 
 $("#password").blur(isPasswordValid);
 
@@ -12,6 +15,7 @@ $("#register").submit(function() {
 	isValid = true;
 
 	isValid = isValid && isUsernameValid();
+	isValid = isValid && isEmailValid();
 	isValid = isValid && isPasswordValid();
 	isValid = isValid && isVerificationValid();
 
@@ -35,6 +39,31 @@ function isUsernameValid() {
 	} else {
 		$("#username-group").removeClass("error");
 		$("#username-error").hide();
+		return true;
+	}
+}
+
+function isEmailValid() {
+	var regex = new RegExp("([a-z]*.)+@[a-z]+.[a-z]+");
+	var value = email.value
+	if (value == undefined) {
+		$("#email-group").addClass("error");
+		$("#email-error-text").text("Can't leave email field blank");
+		$("#email-error").show();
+		return false;
+	} else if (!regex.test(email.value)) {
+		$("#email-group").addClass("error");
+		$("#email-error-text").text("Invalid email provided");
+		$("#email-error").show();
+		return false;
+	} else if (isEmailTaken(email)) {
+		$("#email-group").addClass("error");
+		$("#email-error-text").text("An account already exists with the provded email");
+		$("#email-error").show();
+		return false;
+	} else {
+		$("#email-group").removeClass("error");
+		$("#email-error").hide();
 		return true;
 	}
 }
@@ -93,6 +122,26 @@ function isUsernameTaken(username) {
 		dataType: "json",
 		data: {
 			username: name
+		},
+		success: function(data) {
+			isTaken = data.isTaken;
+		},
+		async: false
+	});
+
+	return isTaken;
+}
+
+function isEmailTaken(email) {
+	var value = email.value;
+	var isTaken = false;
+
+	$.ajax({
+		type: 'POST',
+		url: "/email_taken",
+		dataType: "json",
+		data: {
+			email: value
 		},
 		success: function(data) {
 			isTaken = data.isTaken;

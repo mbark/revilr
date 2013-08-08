@@ -59,8 +59,14 @@ func FindUserByName(username string) (user *data.User, err error) {
 	return
 }
 
-func CreateUser(username, password string) (user data.User, err error) {
-	user, err = data.CreateUser(username, password)
+func FindUserByEmail(email string) (user *data.User, err error) {
+	collection := database.C(usersC)
+	err = collection.Find(bson.M{"email": email}).One(&user)
+	return
+}
+
+func CreateUser(username, password, email string) (user data.User, err error) {
+	user, err = data.CreateUser(username, password, email)
 	if err != nil {
 		return
 	}
