@@ -13,7 +13,8 @@ type (
 		UserId  bson.ObjectId `json:"uid"     bson:"uid"`
 		Type    string        `json:"type"    bson:"type"`
 		Url     string        `json:"url"     bson:"url"`
-		Comment string        `json:"comment" bson:"comment"`
+		Title	string        `json:"title"   bson:"title"`
+		Note 	string        `json:"note"    bson:"note"`
 		Created time.Time     `json:"created" bson:"created"`
 	}
 

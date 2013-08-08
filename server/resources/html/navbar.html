@@ -1,32 +1,35 @@
 <div class="navbar">
   <div class="navbar-inner">
-    <a class="brand" href="/revilr">revilr</a>
-    <ul class="nav">
-      <li class="page{{#page}} open{{/page}}"> <a href="/revilr/page">Pages</a></li>
-      <li class="image{{#image}} open{{/image}}"><a href="/revilr/image">Images</a></li>
-      <li class="selection{{#selection}} open{{/selection}}"><a href="/revilr/selection">Selections</a></li>
-      <li class="revil{{#revil}} open{{/revil}}"><a href="/revil">Revil</a></li>
-    </ul>
-    <ul class="nav pull-right">
-      <li class="dropdown">
-        <a class="dropdown-toggle" id="userdrop" role="button" data-toggle="dropdown">
-          {{username}}{{^username}}Log in{{/username}}
-        </a>
-        <ul class="dropdown-menu" role="menu" aria-labelledby="userdrop">
-          {{^loggedIn}}
-          <li role="presentation">
-            <a role="menuitem" tabindex="-1" href="/login">Log in</a>
-          </li>
-          <li role="presentation">
-            <a role="menuitem" tabindex="-1" href="/register">Register</a>
-          </li>
-          {{/loggedIn}}{{#loggedIn}}
-          <li role="presentation">
-            <a role="menuitem" tabindex="-1" href="/logout">Logout</a>
-          </li>
-          {{/loggedIn}}
-        </ul>
+    <div class="container">
+      <a class="brand" href="/revilr">revilr</a>
+      <ul class="nav">
+        <li class="nav-home {{#home}}active{{/home}}"><a href="/revilr">Home</a></li>
+        <li class="nav-page {{#page}}active{{/page}}"><a href="/revilr/page">Pages</a></li>
+        <li class="nav-image {{#image}} active{{/image}}"><a href="/revilr/image">Images</a></li>
+        <li class="nav-selection {{#selection}} active{{/selection}}"><a href="/revilr/selection">Selections</a></li>
+        <li class="nav-revil {{#revil}} active{{/revil}}"><a href="/revil">Revil</a></li>
       </ul>
-    </li>
+      <ul class="nav pull-right">
+        <li class="dropdown">
+          <a class="dropdown-toggle" id="userdrop" role="button" data-toggle="dropdown">
+            {{username}}{{^username}}Log in{{/username}}
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="userdrop">
+            {{^loggedIn}}
+            <li role="presentation">
+              <a role="menuitem" tabindex="-1" href="/login">Log in</a>
+            </li>
+            <li role="presentation">
+              <a role="menuitem" tabindex="-1" href="/register">Register</a>
+            </li>
+            {{/loggedIn}}{{#loggedIn}}
+            <li role="presentation">
+              <a role="menuitem" tabindex="-1" href="/logout">Logout</a>
+            </li>
+            {{/loggedIn}}
+          </ul>
+        </li>
+      </ul>
+    </div>
   </div>
 </div>

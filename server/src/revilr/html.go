@@ -27,7 +27,7 @@ func parseFile(file string) *mustache.Template {
 }
 
 func DisplayRevils(revils []data.Revil, revilType string, writer http.ResponseWriter, request *http.Request) {
-	data := formatRevilsForOutput(revils, revilType)
+	data := formatRevilsForOutput(revils)
 	data["navbar"] = getNavbar(revilType, request)
 	html := display.RenderInLayout(layout, data)
 
@@ -74,7 +74,7 @@ func DisplayRevil(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprintf(writer, html)
 }
 
-func formatRevilsForOutput(revils []data.Revil, revilType string) map[string]interface{} {
+func formatRevilsForOutput(revils []data.Revil) map[string]interface{} {
 	values := make(map[string]interface{})
 	values["revils"] = getListOfRevilMaps(revils)
 	return values

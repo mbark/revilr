@@ -1,23 +1,30 @@
 {{{navbar}}}
 
-<div id="main">{{#revils}}{{#image}}
-  <div class="well image-revil">
-    <div class="revil-type">{{type}}</div>
-    <p class="revil-comment">{{comment}}</p>
-    <a href="{{url}}"><img class="revil-img" src="{{url}}"></img></a>
-    <p class="revil-link"><a title="{{url}}" href="{{url}}">@{{display-url}}</a></p>
+<div id="main">
+{{#revils}}{{#image}}
+  <div class="well revil">
+    <p class="revil-title">
+      <a class="revil-link" title="{{url}}" href="{{url}}">{{title}}</a>
+    </p>
+    <p class="revil-url">({{display-url}})</p>
+    <img class="revil-img" src="{{url}}"></img>
+    <p class="revil-note">{{note}}</p>
     <p class="revil-date">{{date}}</p>
   </div>{{/image}}{{#page}}
-  <div class="well page-revil">
-    <div class="revil-type">{{type}}</div>
-    <p class="revil-comment">{{comment}}</p>
-    <p class="revil-link"><a title="{{url}}" href="{{url}}">@{{display-url}}</a></p>
+  <div class="well revil">
+    <p class="revil-title">
+      <a class="revil-link" title="{{url}}" href="{{url}}">{{title}}</a>
+    </p>
+    <p class="revil-url">({{display-url}})</p>
+    <p class="revil-note">{{note}}</p>
     <p class="revil-date">{{date}}</p>
   </div>{{/page}}{{#selection}}
-  <div class="well selection-revil">
-    <div class="revil-type">{{type}}</div>
-    <blockquote class="revil-comment"><p>{{comment}}</p></blockquote>
-    <p class="revil-link"><a title="{{url}}" href="{{url}}">@{{display-url}}</a></p>
+  <div class="well revil">
+    <p class="revil-title">
+      <a class="revil-link" title="{{url}}" href="{{url}}">{{title}}</a>
+    </p>
+    <p class="revil-url">({{display-url}})</p>
+    <blockquote>{{note}}</blockquote>
     <p class="revil-date">{{date}}</p>
   </div>{{/selection}}{{/revils}}
 </div>

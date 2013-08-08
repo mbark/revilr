@@ -59,14 +59,16 @@ func parseType(request *http.Request) (string, bool) {
 }
 
 func postHandler(request *http.Request, revilType string) {
-	url := request.FormValue("url")
-	comment := request.FormValue("c")
 	userId, ok := getUserId(request)
 	if !ok {
 		return
 	}
 
-	err := db.CreateRevil(userId, revilType, url, comment)
+	url := request.FormValue("url")
+	title := request.FormValue("title")
+	note := request.FormValue("note")
+
+	err := db.CreateRevil(userId, revilType, url, title, note)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -100,7 +102,7 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 			}
 		}
 
-		DisplayRevils(revils, "all", writer, request)
+		DisplayRevils(revils, "home", writer, request)
 	}
 }
 

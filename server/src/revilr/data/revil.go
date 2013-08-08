@@ -6,8 +6,13 @@ import (
 	"net/url"
 )
 
-func CreateRevil(revilType, url, comment string) (rev Revil) {
-	rev = Revil{Id: bson.NewObjectId(), Type: revilType, Url: url, Comment: comment, Created: bson.Now()}
+func CreateRevil(revilType, url, title, note string) (rev Revil) {
+	rev.Id = bson.NewObjectId()
+	rev.Created = bson.Now()
+	rev.Type = revilType
+	rev.Url = url
+	rev.Title = title
+	rev.Note = note
 	return
 }
 
@@ -17,7 +22,8 @@ func (r Revil) toString() string {
 	result += "{"
 	result += " type: " + r.Type
 	result += ", url: " + r.Url
-	result += ", comment: \"" + r.Comment + "\""
+	result += ", title: " + r.Title
+	result += ", note: " + r.Note
 	result += " }"
 
 	return result
@@ -31,7 +37,8 @@ func (rev Revil) AsMap() map[string]interface{} {
 	data := make(map[string]interface{})
 
 	data["url"] = rev.Url
-	data["comment"] = rev.Comment
+	data["title"] = rev.Title
+	data["note"] = rev.Note
 	data["date"] = rev.Created
 	data["display-url"] = rev.parseUrl()
 	data["type"] = rev.Type

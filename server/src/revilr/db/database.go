@@ -25,8 +25,8 @@ func OpenConnection() (err error) {
 	return
 }
 
-func CreateRevil(userId, revilType, url, comment string) error {
-	rev := data.CreateRevil(revilType, url, comment)
+func CreateRevil(userId, revilType, url, title, note string) error {
+	rev := data.CreateRevil(revilType, url, title, note)
 	rev.UserId = bson.ObjectIdHex(userId)
 
 	collection := database.C(revilsC)
