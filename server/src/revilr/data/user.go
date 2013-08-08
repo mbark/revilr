@@ -3,6 +3,10 @@ package data
 import (
 	"code.google.com/p/go.crypto/bcrypt"
 	"labix.org/v2/mgo/bson"
+	"crypto/md5"
+	"io"
+	"strings"
+	"fmt"
 )
 
 func CreateUser(username string, password, email string) (user User, err error) {
@@ -16,6 +20,23 @@ func CreateUser(username string, password, email string) (user User, err error) 
 	}
 	return
 }
+
+func (user User) AsMap() map[string]interface{} {
+	data := make(map[string]interface{})
+
+	data["username"] = user.Username
+	data["email"] = user.Email
+	data["emailHash"] = user.EmailHash()
+
+	return data
+}
+
+func (user User) EmailHash() string {
+	m := md5.New()
+	io.WriteString(m, strings.ToLower(user.Email))
+	return fmt.Sprintf("%x", m.Sum(nil))
+}
+
 
 func (user User) PasswordMatches(password string) bool {
 	err := bcrypt.CompareHashAndPassword(user.Password, []byte(password))

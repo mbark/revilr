@@ -50,8 +50,8 @@ func DisplayLogout(writer http.ResponseWriter, request *http.Request) {
 	fmt.Fprintf(writer, html)
 }
 
-func DisplayUser(writer http.ResponseWriter, request *http.Request) {
-	data := make(map[string]interface{})
+func DisplayUser(writer http.ResponseWriter, request *http.Request, user data.User) {
+	data := user.AsMap()
 	data["navbar"] = getNavbar("user", request)
 	html := userUrl.RenderInLayout(layout, data)
 
@@ -105,9 +105,8 @@ func getNavbar(revilType string, request *http.Request) string {
 	if user, ok := getUser(request); ok && isLoggedIn(request) {
 		data["username"] = user.Username
 		data["loggedIn"] = true
+		data["emailHash"] = user.EmailHash()
 	}
 
-	html := navbar.Render(data)
-
-	return html
+	return navbar.Render(data)
 }

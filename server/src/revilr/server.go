@@ -127,10 +127,10 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
-	loggedIn := isLoggedIn(request)
+	user, ok := getUser(request)
 
-	if loggedIn {
-		DisplayUser(writer, request)
+	if ok {
+		DisplayUser(writer, request, user)
 	} else {
 		http.Redirect(writer, request, "/login", http.StatusMovedPermanently)
 	}
@@ -144,7 +144,6 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 			email := request.FormValue("email")
 
 			user, err := db.CreateUser(username, password, email)
-			fmt.Println(user)
 			if err == nil {
 				err = setUser(writer, request, user)
 				if err == nil {

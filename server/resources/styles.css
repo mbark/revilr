@@ -7,10 +7,6 @@
 	width: 800px;
 }
 
-#register {
-	width: 450px;
-}
-
 body {
 	background-image: url(/resources/kindajean.png);
 	background-repeat: repeat
@@ -88,4 +84,22 @@ blockquote:first-child {
 
 blockquote:last-child {
 	margin-bottom: 0;
+}
+
+.navbar-avatar {
+	border-radius: 3px;
+	margin: 0px 5px 0px;
+}
+
+#register {
+	width: 450px;
+}
+
+img.user-avatar {
+	border-radius: 3px;
+}
+
+.user-name {
+	font-size: 24px;
+	padding-top: 10px;
 }
