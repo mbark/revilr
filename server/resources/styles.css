@@ -59,6 +59,10 @@ a.revil-link {
 	font-size: 22px;
 }
 
+.revil-btn-group {
+	float: right;
+}
+
 a.dropdown-toggle {
 	cursor: pointer;
 }

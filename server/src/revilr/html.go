@@ -1,24 +1,35 @@
 package main
 
 import (
-	"fmt"
 	"github.com/hoisie/mustache"
-	"net/http"
 	"revilr/data"
 )
 
 var (
-	layout    = parseFile("resources/html/layout.html")
-	navbar    = parseFile("resources/html/navbar.html")
-	display   = parseFile("resources/html/display.html")
-	loginTmpl = parseFile("resources/html/login.html")
-	logout    = parseFile("resources/html/logout.html")
-	userUrl   = parseFile("resources/html/user.html")
-	register  = parseFile("resources/html/register.html")
-	revil     = parseFile("resources/html/revil.html")
+	layout = createPage("resources/html/layout.html")
+	navbar = createPage("resources/html/navbar.html")
+	notFound = createPage("resources/html/notfound.html")
 )
 
-func parseFile(file string) *mustache.Template {
+var pageMap map[string]*mustache.Template = createPages()
+
+func createPages() map[string]*mustache.Template {
+	aMap := make(map[string]*mustache.Template)
+
+	aMap["home"]      = createPage("resources/html/display.html")
+	aMap["login"]     = createPage("resources/html/login.html")
+	aMap["logout"]    = createPage("resources/html/logout.html")
+	aMap["user"]      = createPage("resources/html/user.html")
+	aMap["register"]  = createPage("resources/html/register.html")
+	aMap["revil"]     = createPage("resources/html/revil.html")
+	aMap["page"]      = createPage("resources/html/display.html")
+	aMap["image"]     = createPage("resources/html/display.html")
+	aMap["selection"] = createPage("resources/html/display.html")
+
+	return aMap
+}
+
+func createPage(file string) (*mustache.Template) {
 	tmpl, err := mustache.ParseFile(file)
 	if err != nil {
 		panic(err)
@@ -26,85 +37,42 @@ func parseFile(file string) *mustache.Template {
 	return tmpl
 }
 
-func DisplayRevils(revils []data.Revil, revilType string, writer http.ResponseWriter, request *http.Request) {
-	data := formatRevilsForOutput(revils)
-	data["navbar"] = getNavbar(revilType, request)
-	html := display.RenderInLayout(layout, data)
-
-	fmt.Fprintf(writer, html)
+func Render(page string, user *data.User) string {
+	return RenderWithAdditionalData(page, user, make(map[string]interface{}))
 }
 
-func DisplayLogin(writer http.ResponseWriter, request *http.Request) {
-	data := make(map[string]interface{})
-	data["navbar"] = getNavbar("login", request)
-	html := loginTmpl.RenderInLayout(layout, data)
+func RenderWithAdditionalData(page string, user *data.User, data map[string]interface{}) string {
+	data["navbar"] = getNavbar(page, user)
+	template := pageMap[page]
+	if template == nil {
+		template = notFound
+	}
 
-	fmt.Fprintf(writer, html)
+	return template.RenderInLayout(layout, data)
 }
 
-func DisplayLogout(writer http.ResponseWriter, request *http.Request) {
-	data := make(map[string]interface{})
-	data["navbar"] = getNavbar("logout", request)
-	html := logout.RenderInLayout(layout, data)
+func RevilsAsMap(revils []data.Revil) map[string]interface{} {
+	revilsMap := make([]map[string]interface{}, len(revils))
 
-	fmt.Fprintf(writer, html)
-}
+	for key, rev := range revils {
+		dataType := make(map[string]interface{})
+		dataType[rev.Type] = rev.AsMap()
 
-func DisplayUser(writer http.ResponseWriter, request *http.Request, user data.User) {
-	data := user.AsMap()
-	data["navbar"] = getNavbar("user", request)
-	html := userUrl.RenderInLayout(layout, data)
+		revilsMap[key] = dataType
+	}
 
-	fmt.Fprintf(writer, html)
-}
-
-func DisplayRegister(writer http.ResponseWriter, request *http.Request) {
-	data := make(map[string]interface{})
-	data["navbar"] = getNavbar("register", request)
-	html := register.RenderInLayout(layout, data)
-
-	fmt.Fprintf(writer, html)
-}
-
-func DisplayRevil(writer http.ResponseWriter, request *http.Request) {
-	data := make(map[string]interface{})
-	data["navbar"] = getNavbar("revil", request)
-	html := revil.RenderInLayout(layout, data)
-
-	fmt.Fprintf(writer, html)
-}
-
-func formatRevilsForOutput(revils []data.Revil) map[string]interface{} {
 	values := make(map[string]interface{})
-	values["revils"] = getListOfRevilMaps(revils)
+	values["revils"] = revilsMap
 	return values
 }
 
-func getListOfRevilMaps(revils []data.Revil) []map[string]interface{} {
-	revilMaps := make([]map[string]interface{}, len(revils))
-
-	for key, rev := range revils {
-		revilMaps[key] = getMapForRevil(rev)
-	}
-
-	return revilMaps
-}
-
-func getMapForRevil(rev data.Revil) map[string]interface{} {
-	dataType := make(map[string]interface{})
-	dataType[rev.Type] = rev.AsMap()
-
-	return dataType
-}
-
-func getNavbar(revilType string, request *http.Request) string {
+func getNavbar(page string, user *data.User) string {
 	data := make(map[string]interface{})
-	data[revilType] = true
-	data["loggedIn"] = false
+	data[page] = true
+	data["loggedIn"] = user != nil
 
-	if user, ok := getUser(request); ok && isLoggedIn(request) {
+	if user != nil {
 		data["username"] = user.Username
-		data["loggedIn"] = true
 		data["emailHash"] = user.EmailHash()
 	}
 

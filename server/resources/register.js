@@ -58,7 +58,7 @@ function isEmailValid() {
 		return false;
 	} else if (isEmailTaken(email)) {
 		$("#email-group").addClass("error");
-		$("#email-error-text").text("An account already exists with the provded email");
+		$("#email-error-text").text("An account already exists with that email");
 		$("#email-error").show();
 		return false;
 	} else {

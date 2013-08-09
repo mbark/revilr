@@ -77,26 +77,28 @@ func postHandler(request *http.Request, revilType string) {
 }
 
 func getHandler(writer http.ResponseWriter, request *http.Request, revilType string) {
-	user, ok := getUser(request)
-	if !ok {
+	user := getUser(request)
+	if user == nil {
 		return
 	}
-	revils, err := db.GetRevilsOfType(revilType, user)
+	revils, err := db.GetRevilsOfType(revilType, *user)
 	if err != nil {
 		fmt.Println(err)
 		revils = make([]data.Revil, 0)
 	}
-	DisplayRevils(revils, revilType, writer, request)
+
+	revilsMap := RevilsAsMap(revils)
+	ShowResponsePage(writer, request, revilType, revilsMap)
 }
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	if !isLoggedIn(request) {
 		http.Redirect(writer, request, "/login", http.StatusMovedPermanently)
 	} else {
-		user, ok := getUser(request)
+		user := getUser(request)
 		revils := make([]data.Revil, 0)
-		if ok {
-			allRevils, err := db.GetAllRevilsInDatabase(user)
+		if user != nil {
+			allRevils, err := db.GetAllRevilsInDatabase(*user)
 			if err != nil {
 				fmt.Println(err)
 			} else {
@@ -104,7 +106,8 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 			}
 		}
 
-		DisplayRevils(revils, "home", writer, request)
+		revilsMap := RevilsAsMap(revils)
+		ShowResponsePage(writer, request, "home", revilsMap)		
 	}
 }
 
@@ -122,15 +125,14 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 			}
 		}
 	} else if request.Method == "GET" {
-		DisplayLogin(writer, request)
+		ShowResponsePage(writer, request, "login", make(map[string]interface{}))
 	}
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
-	user, ok := getUser(request)
-
-	if ok {
-		DisplayUser(writer, request, user)
+	user := getUser(request)
+	if user != nil {
+		ShowResponsePage(writer, request, "user", user.AsMap())
 	} else {
 		http.Redirect(writer, request, "/login", http.StatusMovedPermanently)
 	}
@@ -159,7 +161,7 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 			fmt.Println("Invalid register")
 		}
 	} else if request.Method == "GET" {
-		DisplayRegister(writer, request)
+		ShowResponsePage(writer, request, "register", make(map[string]interface{}))
 	}
 }
 
@@ -196,7 +198,7 @@ func logoutHandler(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		DisplayLogout(writer, request)
+		ShowResponsePage(writer, request, "logout", make(map[string]interface{}))
 	}
 
 }
@@ -205,7 +207,7 @@ func revilHandler(writer http.ResponseWriter, request *http.Request) {
 	if !isLoggedIn(request) {
 		http.Redirect(writer, request, "/login", http.StatusFound)
 	} else {
-		DisplayRevil(writer, request)
+		ShowResponsePage(writer, request, "revil", make(map[string]interface{}))
 	}
 }
 
@@ -250,18 +252,24 @@ func verifyUser(request *http.Request) (*data.User, bool) {
 	return nil, false
 }
 
-func getUser(request *http.Request) (user data.User, ok bool) {
+func getUser(request *http.Request) (user *data.User) {
 	userId, ok := getUserId(request)
 	if !ok {
 		return
 	}
 
-	userPointer, err := db.FindUserById(userId)
-	ok = err == nil
-	if userPointer != nil {
-		user = *userPointer
+	user, err := db.FindUserById(userId)
+	if err != nil {
+		fmt.Println(err)
+		user = nil
 	}
 	return
+}
+
+func ShowResponsePage(writer http.ResponseWriter, request *http.Request, name string, data map[string]interface{}) {
+	user := getUser(request)
+	html := RenderWithAdditionalData(name, user, data)
+	fmt.Fprintf(writer, html)
 }
 
 type Response map[string]interface{}
