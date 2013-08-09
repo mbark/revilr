@@ -12,7 +12,10 @@
       <ul class="nav pull-right">
         <li class="dropdown">
           <a class="dropdown-toggle" id="userdrop" role="button" data-toggle="dropdown">
-            <img class="navbar-avatar" src="http://www.gravatar.com/avatar/{{emailHash}}.png?s=20">{{username}}</img>{{^username}}Log in{{/username}}
+            {{#username}}
+            <img class="navbar-avatar" src="http://www.gravatar.com/avatar/{{emailHash}}.png?s=20">{{username}}</img>
+            {{/username}}
+            {{^username}}Log in{{/username}}
           </a>
           <ul class="dropdown-menu" role="menu" aria-labelledby="userdrop">
             {{^loggedIn}}
