@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	layout = createPage("resources/html/layout.html")
-	navbar = createPage("resources/html/navbar.html")
+	layout   = createPage("resources/html/layout.html")
+	navbar   = createPage("resources/html/navbar.html")
 	notFound = createPage("resources/html/notfound.html")
 )
 
@@ -16,20 +16,20 @@ var pageMap map[string]*mustache.Template = createPages()
 func createPages() map[string]*mustache.Template {
 	aMap := make(map[string]*mustache.Template)
 
-	aMap["home"]      = createPage("resources/html/display.html")
-	aMap["login"]     = createPage("resources/html/login.html")
-	aMap["logout"]    = createPage("resources/html/logout.html")
-	aMap["user"]      = createPage("resources/html/user.html")
-	aMap["register"]  = createPage("resources/html/register.html")
-	aMap["revil"]     = createPage("resources/html/revil.html")
-	aMap["page"]      = createPage("resources/html/display.html")
-	aMap["image"]     = createPage("resources/html/display.html")
+	aMap["home"] = createPage("resources/html/display.html")
+	aMap["login"] = createPage("resources/html/login.html")
+	aMap["logout"] = createPage("resources/html/logout.html")
+	aMap["user"] = createPage("resources/html/user.html")
+	aMap["register"] = createPage("resources/html/register.html")
+	aMap["revil"] = createPage("resources/html/revil.html")
+	aMap["page"] = createPage("resources/html/display.html")
+	aMap["image"] = createPage("resources/html/display.html")
 	aMap["selection"] = createPage("resources/html/display.html")
 
 	return aMap
 }
 
-func createPage(file string) (*mustache.Template) {
+func createPage(file string) *mustache.Template {
 	tmpl, err := mustache.ParseFile(file)
 	if err != nil {
 		panic(err)

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 	"regexp"
 	"revilr/data"
@@ -11,7 +12,6 @@ import (
 
 const lenPath = len("/revilr/")
 
-var validTypes = regexp.MustCompile("^(page|image|selection)$")
 var validEmail = regexp.MustCompile("([a-z]*.)+@[a-z]+.[a-z]+")
 
 func main() {
@@ -20,22 +20,33 @@ func main() {
 		panic(err)
 	}
 
-	http.HandleFunc("/revilr/", requireLogin(httpHandler))
-	http.HandleFunc("/revilr", requireLogin(indexHandler))
-	http.HandleFunc("/user", requireLogin(userHandler))
-	http.HandleFunc("/login", loginHandler)
-	http.HandleFunc("/register", registerHandler)
-	http.HandleFunc("/logout", logoutHandler)
-	http.HandleFunc("/revil", requireLogin(revilHandler))
-	http.HandleFunc("/user_taken", userTakenHandler)
-	http.HandleFunc("/email_taken", emailTakenHandler)
-	http.HandleFunc("/user_valid", isValidUserHandler)
+	r := mux.NewRouter()
+	r.StrictSlash(true)
+
+	r.HandleFunc("/revilr/post", requireLogin(postRevil)).Methods("POST")
+	r.HandleFunc("/login", loginUser).Methods("POST")
+	r.HandleFunc("/register", registerUser).Methods("POST")
+
+	r.HandleFunc("/revilr", requireLogin(indexHandler))
+	r.HandleFunc("/revilr/{type:(page|image|selection)}", requireLogin(showRevilsOfType))
+	r.HandleFunc("/user", requireLogin(userHandler))
+	r.HandleFunc("/revil", showSimpleResponse("revil"))
+	r.HandleFunc("/login", showSimpleResponse("login"))
+	r.HandleFunc("/register", showSimpleResponse("register"))
+
+	r.HandleFunc("/logout", logoutHandler)
+
+	r.HandleFunc("/user_taken", userTakenHandler)
+	r.HandleFunc("/email_taken", emailTakenHandler)
+	r.HandleFunc("/user_valid", isValidUserHandler)
+
+	http.Handle("/", r)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
 
 	http.ListenAndServe(":8080", nil)
 }
 
-func requireLogin(fn func (http.ResponseWriter, *http.Request, *data.User)) http.HandlerFunc {
+func requireLogin(fn func(http.ResponseWriter, *http.Request, *data.User)) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
 		loggedIn := isLoggedIn(request)
 		if !loggedIn {
@@ -43,91 +54,66 @@ func requireLogin(fn func (http.ResponseWriter, *http.Request, *data.User)) http
 		} else {
 			user := getUser(request)
 			if user == nil {
+				fmt.Println("Unable to get user")
 				http.NotFound(writer, request)
 			} else {
-				fn(writer, request, user)	
+				fn(writer, request, user)
 			}
 		}
 	}
 }
 
-func httpHandler(writer http.ResponseWriter, request *http.Request, user *data.User) {
-	revilType, success := parseType(request)
-	if !success {
-		http.NotFound(writer, request)
-		return
-	}
-
-	if request.Method == "POST" {
-		postHandler(request, user, revilType)
-		http.Redirect(writer, request, "/revilr", http.StatusTemporaryRedirect)
-	} else if request.Method == "GET" {
-		getHandler(writer, request, user, revilType)
+func showSimpleResponse(name string) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		user := getUser(request)
+		ShowResponsePage(writer, user, name, make(map[string]interface{}))
 	}
 }
 
-func parseType(request *http.Request) (string, bool) {
-	revilType := request.URL.Path[lenPath:]
-	if !validTypes.MatchString(revilType) {
-		revilType = request.FormValue("type")
-	}
-	return revilType, validTypes.MatchString(revilType)
-}
-
-func postHandler(request *http.Request, user *data.User, revilType string) {
-	url := request.FormValue("url")
-	title := request.FormValue("title")
-	note := request.FormValue("note")
-
-	// fulhack
-	id := user.Id.Hex()
-	err := db.CreateRevil(id, revilType, url, title, note)
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-
-func getHandler(writer http.ResponseWriter, request *http.Request, user *data.User, revilType string) {
-	revils, err := db.GetRevilsOfType(revilType, *user)
+func indexHandler(writer http.ResponseWriter, request *http.Request, user *data.User) {
+	revils, err := db.GetAllRevilsInDatabase(*user)
 	if err != nil {
 		fmt.Println(err)
 		revils = make([]data.Revil, 0)
 	}
 
 	revilsMap := RevilsAsMap(revils)
-	ShowResponsePage(writer, user, revilType, revilsMap)
+	ShowResponsePage(writer, user, "home", revilsMap)
 }
 
-func indexHandler(writer http.ResponseWriter, request *http.Request, user *data.User) {
-	revils := make([]data.Revil, 0)
-	if user != nil {
-		allRevils, err := db.GetAllRevilsInDatabase(*user)
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			revils = allRevils
-		}
+func postRevil(writer http.ResponseWriter, request *http.Request, user *data.User) {
+	url := request.FormValue("url")
+	title := request.FormValue("title")
+	note := request.FormValue("note")
+	revilType := request.FormValue("type")
+
+	id := user.Id.Hex()
+	err := db.CreateRevil(id, revilType, url, title, note)
+	if err != nil {
+		fmt.Println(err)
+	}
+	http.Redirect(writer, request, "/revilr", http.StatusTemporaryRedirect)
+}
+
+func showRevilsOfType(writer http.ResponseWriter, request *http.Request, user *data.User) {
+	vars := mux.Vars(request)
+	revils, err := db.GetRevilsOfType(vars["type"], *user)
+	if err != nil {
+		fmt.Println(err)
+		revils = make([]data.Revil, 0)
 	}
 
 	revilsMap := RevilsAsMap(revils)
-	ShowResponsePage(writer, user, "home", revilsMap)		
+	ShowResponsePage(writer, user, vars["type"], revilsMap)
 }
 
-func loginHandler(writer http.ResponseWriter, request *http.Request) {
-	if isLoggedIn(request) {
-		http.Redirect(writer, request, "/user", http.StatusTemporaryRedirect)
-	}
+func loginUser(writer http.ResponseWriter, request *http.Request) {
+	user, canLogin := verifyUser(request)
 
-	if request.Method == "POST" {
-		user, canLogin := verifyUser(request)
-
-		if canLogin && user != nil {
-			if setUser(writer, request, *user) == nil {
-				http.Redirect(writer, request, "/user", http.StatusMovedPermanently)
-			}
+	if canLogin && user != nil {
+		if setUser(writer, request, *user) == nil {
+			http.Redirect(writer, request, "/user", http.StatusMovedPermanently)
 		}
-	} else if request.Method == "GET" {
-		ShowResponsePage(writer, nil, "login", make(map[string]interface{}))
 	}
 }
 
@@ -135,30 +121,26 @@ func userHandler(writer http.ResponseWriter, request *http.Request, user *data.U
 	ShowResponsePage(writer, user, "user", user.AsMap())
 }
 
-func registerHandler(writer http.ResponseWriter, request *http.Request) {
-	if request.Method == "POST" {
-		if isValidRegister(request) {
-			username := request.FormValue("username")
-			password := request.FormValue("password")
-			email := request.FormValue("email")
+func registerUser(writer http.ResponseWriter, request *http.Request) {
+	if isValidRegister(request) {
+		username := request.FormValue("username")
+		password := request.FormValue("password")
+		email := request.FormValue("email")
 
-			user, err := db.CreateUser(username, password, email)
+		user, err := db.CreateUser(username, password, email)
+		if err == nil {
+			err = setUser(writer, request, user)
 			if err == nil {
-				err = setUser(writer, request, user)
-				if err == nil {
-					http.Redirect(writer, request, "/user", http.StatusTemporaryRedirect)
-					return
-				} else {
-					fmt.Println(err)
-				}
+				http.Redirect(writer, request, "/user", http.StatusTemporaryRedirect)
+				return
 			} else {
 				fmt.Println(err)
 			}
 		} else {
-			fmt.Println("Invalid register")
+			fmt.Println(err)
 		}
-	} else if request.Method == "GET" {
-		ShowResponsePage(writer, nil, "register", make(map[string]interface{}))
+	} else {
+		fmt.Println("Invalid register")
 	}
 }
 
@@ -168,11 +150,11 @@ func isValidRegister(request *http.Request) bool {
 	verification := request.FormValue("verification")
 	email := request.FormValue("email")
 
-	if len(username) < 5 || len(username) > 12 {
+	if len(username) < 5 || len(username) > 20 {
 		return false
 	}
 	if !validEmail.MatchString(email) {
-		return false;
+		return false
 	}
 	if len(password) < 8 {
 		return false
@@ -184,7 +166,7 @@ func isValidRegister(request *http.Request) bool {
 		return false
 	}
 	if tmp, _ := db.FindUserByEmail(email); tmp != nil {
-		return false;
+		return false
 	}
 
 	return true
@@ -194,14 +176,8 @@ func logoutHandler(writer http.ResponseWriter, request *http.Request) {
 	err := logOut(writer, request)
 	if err != nil {
 		fmt.Println(err)
-	} else {
-		ShowResponsePage(writer, nil, "logout", make(map[string]interface{}))
 	}
-
-}
-
-func revilHandler(writer http.ResponseWriter, request *http.Request, user *data.User) {
-	ShowResponsePage(writer, user, "revil", make(map[string]interface{}))
+	ShowResponsePage(writer, nil, "logout", make(map[string]interface{}))
 }
 
 func emailTakenHandler(writer http.ResponseWriter, request *http.Request) {
