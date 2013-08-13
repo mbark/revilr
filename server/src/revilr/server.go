@@ -52,9 +52,8 @@ func requireLogin(fn func(http.ResponseWriter, *http.Request, *data.User)) http.
 		if !loggedIn {
 			http.Redirect(writer, request, "/login", http.StatusMovedPermanently)
 		} else {
-			user := getUser(request)
-			if user == nil {
-				fmt.Println("Unable to get user")
+			user, err := getUser(request)
+			if err != nil {
 				http.NotFound(writer, request)
 			} else {
 				fn(writer, request, user)
@@ -65,7 +64,7 @@ func requireLogin(fn func(http.ResponseWriter, *http.Request, *data.User)) http.
 
 func showSimpleResponse(name string) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		user := getUser(request)
+		user, _ := getUser(request)
 		ShowResponsePage(writer, user, name, make(map[string]interface{}))
 	}
 }
@@ -221,17 +220,13 @@ func verifyUser(request *http.Request) (*data.User, bool) {
 	return nil, false
 }
 
-func getUser(request *http.Request) (user *data.User) {
-	userId, ok := getUserId(request)
-	if !ok {
+func getUser(request *http.Request) (user *data.User, err error) {
+	userId, err := getUserId(request)
+	if err != nil {
 		return
 	}
 
-	user, err := db.FindUserById(userId)
-	if err != nil {
-		fmt.Println(err)
-		user = nil
-	}
+	user, err = db.FindUserById(userId)
 	return
 }
 
