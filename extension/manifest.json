@@ -4,7 +4,7 @@
   "version": "0.1",
   "permissions": [
   		"contextMenus",
-  		"http://127.0.0.1:8080/revilr/*"
+  		"http://127.0.0.1:8080/*"
   	],
   "background": {
     "scripts": ["background.js"]

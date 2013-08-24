@@ -30,7 +30,7 @@ func main() {
 	r.HandleFunc("/revilr", requireLogin(indexHandler))
 	r.HandleFunc("/revilr/{type:(page|image|selection)}", requireLogin(showRevilsOfType))
 	r.HandleFunc("/user", requireLogin(userHandler))
-	r.HandleFunc("/revil", showSimpleResponse("revil"))
+	r.HandleFunc("/revil", requireLogin(revilHandler))
 	r.HandleFunc("/login", showSimpleResponse("login"))
 	r.HandleFunc("/register", showSimpleResponse("register"))
 
@@ -92,6 +92,23 @@ func postRevil(writer http.ResponseWriter, request *http.Request, user *data.Use
 		fmt.Println(err)
 	}
 	http.Redirect(writer, request, "/revilr", http.StatusTemporaryRedirect)
+}
+
+
+func revilHandler(writer http.ResponseWriter, request *http.Request, user *data.User) {
+	m := make(map[string]interface{})
+	if url := request.FormValue("url"); url != "" {
+		m["url"] = url
+	}
+	if revilType := request.FormValue("type"); revilType != "" {
+		m[revilType] = true
+		m["type"] = revilType
+	}
+	if title := request.FormValue("title"); title != "" {
+		m["title"] = title
+	}
+
+	ShowResponsePage(writer, user, "revil", m)
 }
 
 func showRevilsOfType(writer http.ResponseWriter, request *http.Request, user *data.User) {

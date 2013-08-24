@@ -1,46 +1,39 @@
-function linkOnClick(info, tab) {
-  	window.localStorage.setItem( 'type', 'page');
-	window.localStorage.setItem( 'url', info.linkUrl);
-
-	openPopup();
-}
-
 function pageOnClick(info, tab) {
-	window.localStorage.setItem( 'type', 'page');
-	window.localStorage.setItem( 'url', info.pageUrl);
-	window.localStorage.setItem( 'comment', tab.title);
+	query = "";
+	query += "type=" + "page";
+	query += "&url=" + info.pageUrl;
+	query += "&title=" + tab.title;
 
-	openPopup();
+	openPopup(query);
 }
 
 function imageOnClick(info, tab) {
-  	window.localStorage.setItem( 'type', 'image');
-	window.localStorage.setItem( 'url', info.srcUrl);
+	query = "";
+	query += "type=" + "image";
+	query += "&url=" + info.srcUrl;
 
-	openPopup();
+	openPopup(query);
 }
 
 function selectionOnClick(info, tab) {
-	window.localStorage.setItem( 'type', 'selection');
-	window.localStorage.setItem( 'url', info.pageUrl);
-	window.localStorage.setItem( 'comment', info.selectionText);
+	query = "";
+	query += "type=" + "selection";
+	query += "&url=" + info.pageUrl;
+	query += "&title=" + info.selectionText;
 
-	openPopup();
+	openPopup(query);
 }
 
-function openPopup() {
-	var popup = 'revil.html';
-	chrome.windows.create({ url: popup, width: 500, height: 255, type:"popup", focused:true });
+function openPopup(query) {
+	var url = "http://localhost:8080/revil";
+	url += "?" + query;
+	window.open(url);
 }
 
 function createContextMenu() {
-chrome.contextMenus.create({"title": "Revil link!", "contexts":["link"], "onclick":linkOnClick});
-
-chrome.contextMenus.create({"title": "Revil this page!", "contexts":["page"], "onclick":pageOnClick});
-
-chrome.contextMenus.create({"title": "Revil image!", "contexts":["image"], "onclick":imageOnClick});
-
-chrome.contextMenus.create({"title": "Revil selection!", "contexts":["selection"], "onclick":selectionOnClick});
+	chrome.contextMenus.create({"title": "Revil this page!", "contexts":["page"], "onclick":pageOnClick});
+	chrome.contextMenus.create({"title": "Revil image!", "contexts":["image"], "onclick":imageOnClick});
+	chrome.contextMenus.create({"title": "Revil selection!", "contexts":["selection"], "onclick":selectionOnClick});
 }
 
 createContextMenu();

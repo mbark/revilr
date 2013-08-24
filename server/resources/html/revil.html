@@ -4,22 +4,22 @@
   <form method="POST" name="revil" action="revilr/post" class="form-horizontal">
     <div class="control-group">
       <label class="control-label" for="type">Type</label>
-      <select name="type" id="type">
-        <option value="page">Page</option>
-        <option value="image">Image</option>
-        <option value="selection">Selection</option>
+      <select {{#type}}disabled{{/type}} name="type" id="type">
+        <option value="page" {{#page}}selected="selected"{{/page}}>Page</option>
+        <option value="image" {{#image}}selected="selected"{{/image}}>Image</option>
+        <option value="selection" {{#selection}}selected="selected"{{/selection}}>Selection</option>
       </select>
     </div>
     <div class="control-group">
       <label class="control-label" for="urlField">URL</label>
       <div class="controls">
-        <input type="text" name="url" id="urlField" placeholder="http://www.example.com">
+        <input {{#url}}disabled{{/url}} type="text" name="url" id="urlField" value="{{url}}">
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="titleField">Title</label>
       <div class="controls">
-        <input type="text" name="title" id="titleField" placeholder="Title">
+        <input type="text" name="title" id="titleField" value="{{title}}">
       </div>
     </div>
     <div class="control-group">
