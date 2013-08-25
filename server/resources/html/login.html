@@ -2,6 +2,8 @@
 
 <div id="main">
   <form id="login" name="login" action="/login" method="POST" class="form-horizontal">
+    <input type="hidden" name="continue" id="continue" value="{{continue}}">
+    
     <div class="control-group">
       <label class="control-label" for="username">Username</label>
       <div class="controls">

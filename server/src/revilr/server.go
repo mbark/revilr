@@ -23,16 +23,17 @@ func main() {
 	r := mux.NewRouter()
 	r.StrictSlash(true)
 
-	r.HandleFunc("/revilr/post", requireLogin(postRevil)).Methods("POST")
+	r.HandleFunc("/revilr/post", postRevil).Methods("POST")
 	r.HandleFunc("/login", loginUser).Methods("POST")
 	r.HandleFunc("/register", registerUser).Methods("POST")
 
-	r.HandleFunc("/revilr", requireLogin(indexHandler))
-	r.HandleFunc("/revilr/{type:(page|image|selection)}", requireLogin(showRevilsOfType))
-	r.HandleFunc("/user", requireLogin(userHandler))
-	r.HandleFunc("/revil", requireLogin(revilHandler))
-	r.HandleFunc("/login", showSimpleResponse("login"))
-	r.HandleFunc("/register", showSimpleResponse("register"))
+	r.HandleFunc("/revilr", indexHandler)
+	r.HandleFunc("/revilr/{type:(page|image|selection)}", showRevilsOfType)
+	r.HandleFunc("/user", userHandler)
+	r.HandleFunc("/revil", revilHandler)
+
+	r.HandleFunc("/login", loginHandler)
+	r.HandleFunc("/register", registerHandler)
 
 	r.HandleFunc("/logout", logoutHandler)
 
@@ -46,30 +47,41 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 
-func requireLogin(fn func(http.ResponseWriter, *http.Request, *data.User)) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-		loggedIn := isLoggedIn(request)
-		if !loggedIn {
-			http.Redirect(writer, request, "/login", http.StatusMovedPermanently)
-		} else {
-			user, err := getUser(request)
-			if err != nil {
-				http.NotFound(writer, request)
-			} else {
-				fn(writer, request, user)
-			}
+func ensureLoggedIn(writer http.ResponseWriter, request *http.Request) bool {
+	loggedIn := isLoggedIn(request)
+	if !loggedIn {
+		http.Redirect(writer, request, "/login?continue="+request.URL.Path, http.StatusMovedPermanently)
+		return false
+	} else {
+		_, err := getUser(request)
+		if err != nil {
+			return false
 		}
 	}
+
+	return true
 }
 
-func showSimpleResponse(name string) http.HandlerFunc {
-	return func(writer http.ResponseWriter, request *http.Request) {
-		user, _ := getUser(request)
-		ShowResponsePage(writer, user, name, make(map[string]interface{}))
+func loginHandler(writer http.ResponseWriter, request *http.Request) {
+	m := make(map[string]interface{})
+	if cont := request.FormValue("continue"); cont != "" {
+		m["continue"] = request.FormValue("continue")
 	}
+
+	ShowResponsePage(writer, nil, "login", m)
 }
 
-func indexHandler(writer http.ResponseWriter, request *http.Request, user *data.User) {
+func registerHandler(writer http.ResponseWriter, request *http.Request) {
+	user, _ := getUser(request)
+	ShowResponsePage(writer, user, "register", make(map[string]interface{}))
+}
+
+func indexHandler(writer http.ResponseWriter, request *http.Request) {
+	if !ensureLoggedIn(writer, request) {
+		return
+	}
+	user, err := getUser(request)
+
 	revils, err := db.GetAllRevilsInDatabase(*user)
 	if err != nil {
 		fmt.Println(err)
@@ -80,14 +92,19 @@ func indexHandler(writer http.ResponseWriter, request *http.Request, user *data.
 	ShowResponsePage(writer, user, "home", revilsMap)
 }
 
-func postRevil(writer http.ResponseWriter, request *http.Request, user *data.User) {
+func postRevil(writer http.ResponseWriter, request *http.Request) {
+	if !ensureLoggedIn(writer, request) {
+		return
+	}
+	user, err := getUser(request)
+
 	url := request.FormValue("url")
 	title := request.FormValue("title")
 	note := request.FormValue("note")
 	revilType := request.FormValue("type")
 
 	id := user.Id.Hex()
-	err := db.CreateRevil(id, revilType, url, title, note)
+	err = db.CreateRevil(id, revilType, url, title, note)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -95,7 +112,12 @@ func postRevil(writer http.ResponseWriter, request *http.Request, user *data.Use
 }
 
 
-func revilHandler(writer http.ResponseWriter, request *http.Request, user *data.User) {
+func revilHandler(writer http.ResponseWriter, request *http.Request) {
+	if !ensureLoggedIn(writer, request) {
+		return
+	}
+	user, _ := getUser(request)
+
 	m := make(map[string]interface{})
 	if url := request.FormValue("url"); url != "" {
 		m["url"] = url
@@ -111,7 +133,12 @@ func revilHandler(writer http.ResponseWriter, request *http.Request, user *data.
 	ShowResponsePage(writer, user, "revil", m)
 }
 
-func showRevilsOfType(writer http.ResponseWriter, request *http.Request, user *data.User) {
+func showRevilsOfType(writer http.ResponseWriter, request *http.Request) {
+	if !ensureLoggedIn(writer, request) {
+		return
+	}
+	user, err := getUser(request)
+
 	vars := mux.Vars(request)
 	revils, err := db.GetRevilsOfType(vars["type"], *user)
 	if err != nil {
@@ -128,12 +155,21 @@ func loginUser(writer http.ResponseWriter, request *http.Request) {
 
 	if canLogin && user != nil {
 		if setUser(writer, request, *user) == nil {
-			http.Redirect(writer, request, "/user", http.StatusMovedPermanently)
+			continueTo := "/user"
+			if val := request.FormValue("continue"); val != "" {
+				continueTo = val
+			}
+			http.Redirect(writer, request, continueTo, http.StatusMovedPermanently)
 		}
 	}
 }
 
-func userHandler(writer http.ResponseWriter, request *http.Request, user *data.User) {
+func userHandler(writer http.ResponseWriter, request *http.Request) {
+	if !ensureLoggedIn(writer, request) {
+		return
+	}
+	user, _ := getUser(request)
+
 	ShowResponsePage(writer, user, "user", user.AsMap())
 }
 
