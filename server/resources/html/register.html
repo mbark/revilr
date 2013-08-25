@@ -1,48 +1,48 @@
 {{{navbar}}}
 
 <div id="main">
-  <form id="register" method="POST" action="/register" name="register" class="form-horizontal">
-    <div id="username-group" class="control-group">
-      <label class="control-label" for="username">Username</label>
-      <div class="controls">
-        <input type="text" name="username" id="username" placeholder="Username">
-      </div>
-      <div id="username-error" class="controls" style="display: none">
-        <span id="username-error-text" class="help-inline"></span>
-      </div>
-    </div>
-    <div id="email-group" class="control-group">
-      <label class="control-label" for="email">Email</label>
-      <div class="controls">
-      <input type="text" name="email" id="email" placeholder="example@mail.com">
-      </div>
-      <div id="email-error" class="controls" style="display: none">
-        <span id="email-error-text" class="help-inline"></span>
+  <form  id="register" name="register" action="/register" method="POST" class="form-horizontal" role="form">
+    <div id="username-group" class="form-group">
+      <label for="username" class="col-lg-2 control-label">Username</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+        <div id="username-error" class="controls" style="display: none">
+          <span id="username-error-text" class="help-inline"></span>
+        </div>
       </div>
     </div>
-    <div id="password-group" class="control-group">
-      <label class="control-label" for="password">Password</label>
-      <div class="controls">
-        <input type="password" name="password" id="password" placeholder="Password">
-      </div>
-      <div id="password-error" class="controls" style="display: none">
-        <span id="password-error-text" class="help-inline"></span>
-      </div>
-    </div>
-    <div id="verification-group" class="control-group">
-      <label class="control-label" for="password2">Retype password</label>
-      <div class="controls">
-        <input type="password" name="verification" id="verification" placeholder="Password">
-      </div>
-      <div id="verification-error" class="controls" style="display: none">
-        <span id="verification-error-text" class="help-inline"></span>
+    <div id="email-group" class="form-group">
+      <label for="email" class="col-lg-2 control-label">Email</label>
+      <div class="col-lg-10">
+        <input type="email" class="form-control" id="email" name="email" placeholder="example@mail.com">
+        <div id="email-error" class="controls" style="display: none">
+          <span id="email-error-text" class="help-inline"></span>
+        </div>
       </div>
     </div>
-    <div class="control-group">
-      <div class="controls">
-        <button type="submit" class="btn">Register</button>
+    <div id="password-group" class="form-group">
+      <label for="password" class="col-lg-2 control-label">Password</label>
+      <div class="col-lg-10">
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+        <div id="password-error" class="controls" style="display: none">
+          <span id="password-error-text" class="help-inline"></span>
+        </div>
+      </div>
+    </div>
+    <div id="verification-group" class="form-group">
+      <label for="verification" class="col-lg-2 control-label">Retype password</label>
+      <div class="col-lg-10">
+        <input type="password" class="form-control" id="verification" name="verification" placeholder="Password">
+        <div id="verification-error" class="controls" style="display: none">
+          <span id="verification-error-text" class="help-inline"></span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-lg-offset-2 col-lg-10">
+        <button type="submit" class="btn btn-default">Sign in</button>
       </div>
     </div>
   </form>
 </div>
-<script src="/resources/register.js"></script>
+<script src="/resources/js/register.js"></script>

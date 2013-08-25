@@ -1,29 +1,29 @@
 {{{navbar}}}
 
 <div id="main">
-  <form id="login" name="login" action="/login" method="POST" class="form-horizontal">
+  <form id="login" name="login" action="/login" method="POST" class="form-horizontal" role="form">
     <input type="hidden" name="continue" id="continue" value="{{continue}}">
-    
-    <div class="control-group">
-      <label class="control-label" for="username">Username</label>
-      <div class="controls">
-        <input type="text" name="username" id="username" placeholder="Username">
+
+    <div class="form-group">
+      <label for="username" class="col-lg-2 control-label">Username</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="username" name="username" placeholder="Username">
       </div>
     </div>
-    <div id="password-group" class="control-group">
-      <label class="control-label" for="password">Password</label>
-      <div class="controls">
-        <input type="password" name="password" id="password" placeholder="Password">
-      </div>
-      <div id="password-error" class="controls" style="display: none">
-        <span id="password-error-text" class="help-inline"></span>
+    <div id="password-group" class="form-group">
+      <label for="password" class="col-lg-2 control-label">Password</label>
+      <div class="col-lg-10">
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+        <div id="password-error" class="controls" style="display: none">
+          <span id="password-error-text" class="help-inline"></span>
+        </div>
       </div>
     </div>
-    <div class="control-group">
-      <div class="controls">
-        <button type="submit" class="btn">Sign in</button>
+    <div class="form-group">
+      <div class="col-lg-offset-2 col-lg-10">
+        <button type="submit" class="btn btn-default">Sign in</button>
       </div>
     </div>
   </form>
 </div>
-<script src="/resources/login.js"></script>
+<script src="/resources/js/login.js"></script>

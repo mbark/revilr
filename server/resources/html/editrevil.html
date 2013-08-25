@@ -1,0 +1,37 @@
+{{{navbar}}}
+
+<div id="main">
+  <form method="POST" name="revil" action="revilr/edit" class="form-horizontal">
+    <div class="control-group">
+      <label class="control-label" for="type">Type</label>
+      <select id="type" name="type" class="disabled">
+        <option value="page">Page</option>
+        <option value="image">Image</option>
+        <option value="selection">Selection</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="urlField">URL</label>
+      <div class="controls">
+        <input type="text" name="url" id="urlField" placeholder="{{url}}">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="titleField">Title</label>
+      <div class="controls">
+        <input type="text" name="title" id="titleField" placeholder="{{title}}">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="noteField">Note</label>
+      <div class="controls">
+        <input type="text" name="note" id="noteField" placeholder="{{note}}">
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">
+        <button type="submit" id="buttonOk" class="btn">Save</button>
+      </div>
+    </div>
+  </form>
+</div>

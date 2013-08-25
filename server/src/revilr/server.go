@@ -51,15 +51,9 @@ func ensureLoggedIn(writer http.ResponseWriter, request *http.Request) bool {
 	loggedIn := isLoggedIn(request)
 	if !loggedIn {
 		http.Redirect(writer, request, "/login?continue="+request.URL.Path, http.StatusMovedPermanently)
-		return false
-	} else {
-		_, err := getUser(request)
-		if err != nil {
-			return false
-		}
 	}
 
-	return true
+	return loggedIn
 }
 
 func loginHandler(writer http.ResponseWriter, request *http.Request) {
@@ -67,8 +61,9 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 	if cont := request.FormValue("continue"); cont != "" {
 		m["continue"] = request.FormValue("continue")
 	}
+	user, _ := getUser(request)
 
-	ShowResponsePage(writer, nil, "login", m)
+	ShowResponsePage(writer, user, "login", m)
 }
 
 func registerHandler(writer http.ResponseWriter, request *http.Request) {
@@ -97,6 +92,9 @@ func postRevil(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	user, err := getUser(request)
+	if err != nil {
+		return
+	}
 
 	url := request.FormValue("url")
 	title := request.FormValue("title")
@@ -116,7 +114,10 @@ func revilHandler(writer http.ResponseWriter, request *http.Request) {
 	if !ensureLoggedIn(writer, request) {
 		return
 	}
-	user, _ := getUser(request)
+	user, err := getUser(request)
+	if err != nil {
+		http.NotFound(writer, request)
+	}
 
 	m := make(map[string]interface{})
 	if url := request.FormValue("url"); url != "" {
@@ -138,6 +139,9 @@ func showRevilsOfType(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	user, err := getUser(request)
+	if err != nil {
+		http.NotFound(writer, request)
+	}
 
 	vars := mux.Vars(request)
 	revils, err := db.GetRevilsOfType(vars["type"], *user)
@@ -154,21 +158,30 @@ func loginUser(writer http.ResponseWriter, request *http.Request) {
 	user, canLogin := verifyUser(request)
 
 	if canLogin && user != nil {
-		if setUser(writer, request, *user) == nil {
+		if err := setUser(writer, request, *user); err == nil {
 			continueTo := "/user"
 			if val := request.FormValue("continue"); val != "" {
 				continueTo = val
 			}
 			http.Redirect(writer, request, continueTo, http.StatusMovedPermanently)
+			return
+		} else {
+			fmt.Println("Unable to set user", err)
 		}
+	} else {
+		fmt.Println("Unable to login", canLogin, user)
 	}
+	http.NotFound(writer, request)
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
 	if !ensureLoggedIn(writer, request) {
 		return
 	}
-	user, _ := getUser(request)
+	user, err := getUser(request)
+	if err != nil {
+		http.NotFound(writer, request)
+	}
 
 	ShowResponsePage(writer, user, "user", user.AsMap())
 }

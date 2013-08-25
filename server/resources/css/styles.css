@@ -1,0 +1,51 @@
+@import "bootstrap.min.css";
+
+body {
+	padding-top: 70px;
+	background-image: url(/resources/kindajean.png);
+	background-repeat: repeat;
+}
+
+.navbar-avatar {
+	margin-right: 10px;
+	border-radius: 3px;
+}
+
+.panel-title > a {
+	color: #2a6496 !important;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+.revil-url {
+	cursor: default;
+	color: #aaa;
+}
+
+.revil-date {
+	float: right;
+	font-size: 11px;
+}
+
+blockquote {
+	margin: 1.5em 1em;
+	padding: .5em 1em;
+	quotes: "\201C""\201D";
+	font-style: italic;
+}
+
+blockquote:before {
+	content:open-quote;
+	font-size: 4em;
+	line-height: .1em;
+	margin-right: .25em;
+	vertical-align: -.4em;
+}
+
+blockquote:first-child {
+	display: inline;
+}
+
+blockquote:last-child {
+	margin-bottom: 0;
+}

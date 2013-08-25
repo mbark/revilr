@@ -1,38 +1,45 @@
 {{{navbar}}}
 
 <div id="main">
-  <form id="revil" method="POST" name="revil" action="revilr/post" class="form-horizontal">
-    <div class="control-group">
-      <label class="control-label" for="type">Type</label>
-      <select {{#type}}disabled{{/type}} name="type" id="type">
-        <option value="page" {{#page}}selected="selected"{{/page}}>Page</option>
-        <option value="image" {{#image}}selected="selected"{{/image}}>Image</option>
-        <option value="selection" {{#selection}}selected="selected"{{/selection}}>Selection</option>
-      </select>
-    </div>
-    <div class="control-group">
-      <label class="control-label" for="urlField">URL</label>
-      <div class="controls">
-        <input {{#url}}disabled{{/url}} type="text" name="url" id="urlField" value="{{url}}">
+  <form id="revil" name="revil" action="revilr/post" method="POST" class="form-horizontal" role="form">
+
+    <div class="form-group">
+      <label for="type" class="col-lg-2 control-label">Type</label>
+      <div class="col-lg-10">
+        <select {{#type}}disabled{{/type}} name="type" id="type" class="form-control">
+          <option value="page" {{#page}}selected="selected"{{/page}}>Page</option>
+          <option value="image" {{#image}}selected="selected"{{/image}}>Image</option>
+          <option value="selection" {{#selection}}selected="selected"{{/selection}}>Selection</option>
+        </select>
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label" for="titleField">Title</label>
-      <div class="controls">
-        <input type="text" name="title" id="titleField" value="{{title}}">
+
+    <div class="form-group">
+      <label for="url" class="col-lg-2 control-label">URL</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="url" name="url" placeholder="http://www.google.com" {{#url}}disabled value="{{url}}"{{/url}}>
       </div>
     </div>
-    <div class="control-group">
-      <label class="control-label" for="noteField">Note</label>
-      <div class="controls">
-        <input type="text" name="note" id="noteField" placeholder="Note">
+
+    <div class="form-group">
+      <label for="title" class="col-lg-2 control-label">Title</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="title" name="title" placeholder="Title" {{#title}}value="{{title}}"{{/title}}>
       </div>
     </div>
-    <div class="control-group">
-      <div class="controls">
-        <button type="submit" id="buttonOk" class="btn">Post</button>
+
+    <div class="form-group">
+      <label for="note" class="col-lg-2 control-label">Note</label>
+      <div class="col-lg-10">
+        <input type="text" class="form-control" id="note" name="note" placeholder="Note">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-lg-offset-2 col-lg-10">
+        <button type="submit" class="btn btn-default">Post</button>
       </div>
     </div>
   </form>
 </div>
-<script src="/resources/revilPost.js"></script>
+<script src="/resources/js/revilPost.js"></script>

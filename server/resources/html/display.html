@@ -1,42 +1,41 @@
 {{{navbar}}}
 
 <div id="main">
-{{#revils}}{{#image}}
-  <div class="well revil">
-  <div class="btn-group revil-btn-group">
-    <button class="btn"><i class="icon-pencil"></i> Edit</button>
-    <button class="btn"><i class="icon-remove"></i> Delete</button>
-  </div>
-    <p class="revil-title">
-      <a class="revil-link" title="{{url}}" href="{{url}}">{{title}}</a>
-    </p>
-    <p class="revil-url">({{display-url}})</p>
-    <img class="revil-img" src="{{url}}"></img>
-    <p class="revil-note">{{note}}</p>
-    <p class="revil-date">{{date}}</p>
+  {{#revils}}{{#image}}
+  <div class="panel panel-default revil">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        <a href="{{url}}">{{title}}</a>
+      </h3>
+    </div>
+    <div class="panel-body">
+      <p class="revil-url">({{display-url}})</p>
+      <img class="revil-img" src="{{url}}"></img>
+      <p class="revil-note">{{note}}</p>
+      <p class="revil-date">{{date}}</p>
+    </div>
   </div>{{/image}}{{#page}}
-  <div class="well revil">
-  <div class="btn-group revil-btn-group">
-    <button class="btn"><i class="icon-pencil"></i> Edit</button>
-    <button class="btn"><i class="icon-remove"></i> Delete</button>
-  </div>
-    <p class="revil-title">
-      <a class="revil-link" title="{{url}}" href="{{url}}">{{title}}</a>
-    </p>
-    <p class="revil-url">({{display-url}})</p>
-    <p class="revil-note">{{note}}</p>
-    <p class="revil-date">{{date}}</p>
+  <div class="panel panel-default revil">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        <a href="{{url}}">{{title}}</a>
+      </h3>
+    </div>
+    <div class="panel-body">
+      <p class="revil-url">({{display-url}})</p>
+      <p class="revil-note">{{note}}</p>
+      <p class="revil-date">{{date}}</p>
+    </div>
   </div>{{/page}}{{#selection}}
-  <div class="well revil">
-  <div class="btn-group revil-btn-group">
-    <button class="btn"><i class="icon-pencil"></i> Edit</button>
-    <button class="btn"><i class="icon-remove"></i> Delete</button>
+  <div class="panel panel-default revil">
+   <div class="panel-heading">
+    <h3 class="panel-title">
+      <a href="{{url}}">{{title}}</a>
+    </h3>
   </div>
-    <p class="revil-title">
-      <a class="revil-link" title="{{url}}" href="{{url}}">{{title}}</a>
-    </p>
+  <div class="panel-body">
     <p class="revil-url">({{display-url}})</p>
     <blockquote>{{note}}</blockquote>
     <p class="revil-date">{{date}}</p>
-  </div>{{/selection}}{{/revils}}
-</div>
+  </div>
+</div>{{/selection}}{{/revils}}
