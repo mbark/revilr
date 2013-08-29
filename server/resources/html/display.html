@@ -10,7 +10,9 @@
     </div>
     <div class="panel-body">
       <p class="revil-url">({{display-url}})</p>
-      <img class="revil-img" src="{{url}}"></img>
+      <a class="revil-img" href="{{url}}" title="{{Title}}">
+        <img src="{{url}}" alt="" />
+      </a>
       <p class="revil-note">{{note}}</p>
       <p class="revil-date">{{date}}</p>
     </div>
@@ -39,3 +41,5 @@
     <p class="revil-date">{{date}}</p>
   </div>
 </div>{{/selection}}{{/revils}}
+<script src="/resources/fancybox/jquery.fancybox.js"></script>
+<script src="/resources/js/display.js"></script>

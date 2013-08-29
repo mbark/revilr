@@ -1,5 +1,7 @@
 @import "bootstrap.min.css";
 
+@import "../fancybox/jquery.fancybox.css";
+
 body {
 	padding-top: 70px;
 	background-image: url(/resources/kindajean.png);
@@ -25,6 +27,11 @@ body {
 .revil-date {
 	float: right;
 	font-size: 11px;
+}
+
+.revil-img>img {
+	max-width: 200px;
+	max-height: 100px;
 }
 
 blockquote {
