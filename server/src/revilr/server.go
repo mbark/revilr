@@ -1,13 +1,13 @@
 package main
 
 import (
-"encoding/json"
-"fmt"
-"github.com/gorilla/mux"
-"net/http"
-"regexp"
-"revilr/data"
-"revilr/db"
+	"encoding/json"
+	"fmt"
+	"github.com/gorilla/mux"
+	"net/http"
+	"regexp"
+	"revilr/data"
+	"revilr/db"
 )
 
 const lenPath = len("/revilr/")
@@ -77,7 +77,7 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 	user, err := getUser(request)
 
-	revils, err := db.GetAllRevilsInDatabase(*user)
+	revils, err := db.GetAllRevils(*user)
 	if err != nil {
 		fmt.Println(err)
 		revils = make([]data.Revil, 0)
@@ -109,7 +109,6 @@ func postRevil(writer http.ResponseWriter, request *http.Request) {
 	}
 	http.Redirect(writer, request, "/", http.StatusTemporaryRedirect)
 }
-
 
 func revilHandler(writer http.ResponseWriter, request *http.Request) {
 	if !ensureLoggedIn(writer, request) {
@@ -165,10 +164,10 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	var revils data.Revils
-	
+
 	loggedInUser, err := getUser(request)
-	if err == nil && loggedInUser.Id == user.Id  {
-		revils, err = db.GetAllRevilsInDatabase(*user)
+	if err == nil && loggedInUser.Id == user.Id {
+		revils, err = db.GetAllRevils(*user)
 	} else {
 		revils, err = db.GetAllPublicRevils(*user)
 	}
@@ -186,7 +185,7 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	ShowResponsePage(writer, user, "user", values)
-	
+
 }
 
 func registerUser(writer http.ResponseWriter, request *http.Request) {

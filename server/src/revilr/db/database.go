@@ -34,7 +34,7 @@ func CreateRevil(userId, revilType, url, title, note string, public bool) error 
 	return err
 }
 
-func GetAllRevilsInDatabase(user data.User) (revils data.Revils, err error) {
+func GetAllRevils(user data.User) (revils data.Revils, err error) {
 	collection := database.C(revilsC)
 	err = collection.Find(bson.M{"uid": user.Id}).Sort("-created").All(&revils)
 	return

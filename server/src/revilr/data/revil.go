@@ -6,16 +6,16 @@ import (
 )
 
 func CreateRevil(revilType, url, title, note string, public bool) (rev Revil) {
-	rev = Revil {
-		Id: bson.NewObjectId(),
+	rev = Revil{
+		Id:      bson.NewObjectId(),
 		Created: bson.Now(),
-		Type: revilType,
-		Url: url,
-		Title: title,
-		Note: note,
-		Public: public,
+		Type:    revilType,
+		Url:     url,
+		Title:   title,
+		Note:    note,
+		Public:  public,
 	}
-	
+
 	return
 }
 
@@ -28,8 +28,8 @@ func (rev Revil) AsMap() map[string]interface{} {
 	data["date"] = rev.Created
 	data["display-url"] = rev.parseUrl()
 	data["type"] = rev.Type
-	if(rev.Public) {
-		data["public"] = rev.Public		
+	if rev.Public {
+		data["public"] = rev.Public
 	}
 
 	return data
