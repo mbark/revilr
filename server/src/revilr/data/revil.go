@@ -1,12 +1,11 @@
 package data
 
 import (
-	"fmt"
 	"labix.org/v2/mgo/bson"
 	"net/url"
 )
 
-func CreateRevil(revilType, url, title, note string) (rev Revil) {
+func CreateRevil(revilType, url, title, note string, public bool) (rev Revil) {
 	rev = Revil {
 		Id: bson.NewObjectId(),
 		Created: bson.Now(),
@@ -14,26 +13,10 @@ func CreateRevil(revilType, url, title, note string) (rev Revil) {
 		Url: url,
 		Title: title,
 		Note: note,
+		Public: public,
 	}
 	
 	return
-}
-
-func (r Revil) toString() string {
-	var result string
-
-	result += "{"
-	result += " type: " + r.Type
-	result += ", url: " + r.Url
-	result += ", title: " + r.Title
-	result += ", note: " + r.Note
-	result += " }"
-
-	return result
-}
-
-func (r Revil) Print() {
-	fmt.Println(r.toString())
 }
 
 func (rev Revil) AsMap() map[string]interface{} {
@@ -45,6 +28,9 @@ func (rev Revil) AsMap() map[string]interface{} {
 	data["date"] = rev.Created
 	data["display-url"] = rev.parseUrl()
 	data["type"] = rev.Type
+	if(rev.Public) {
+		data["public"] = rev.Public		
+	}
 
 	return data
 }

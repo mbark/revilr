@@ -7,15 +7,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="/revilr">revilr</a>
+      <a class="navbar-brand" href="/">revilr</a>
     </div>
 
     <div class="collapse navbar-collapse navbar-top-collapse">
       <ul class="nav navbar-nav">
-        <li class="nav-home {{#home}}active{{/home}}"><a href="/revilr">Home</a></li>
-        <li class="nav-page {{#page}}active{{/page}}"><a href="/revilr/page">Pages</a></li>
-        <li class="nav-image {{#image}} active{{/image}}"><a href="/revilr/image">Images</a></li>
-        <li class="nav-selection {{#selection}} active{{/selection}}"><a href="/revilr/selection">Selections</a></li>
+      <li class="nav-home {{#home}}active{{/home}}"><a href="/">Home</a></li>
         <li class="nav-revil {{#revil}} active{{/revil}}"><a href="/revil">Revil</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -32,7 +29,7 @@
             <li><a role="menuitem" href="/login">Log in</a></li>
             <li><a role="menuitem" href="/register">Register</a></li>
             {{/loggedIn}}{{#loggedIn}}
-            <li><a role="menuitem" href="/user">Account</a></li>
+            <li><a role="menuitem" href="/user/{{username}}">Account</a></li>
             <li><a role="menuitem" href="/logout">Logout</a></li>
             {{/loggedIn}}
           </ul>

@@ -1,13 +1,13 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/gorilla/mux"
-	"net/http"
-	"regexp"
-	"revilr/data"
-	"revilr/db"
+"encoding/json"
+"fmt"
+"github.com/gorilla/mux"
+"net/http"
+"regexp"
+"revilr/data"
+"revilr/db"
 )
 
 const lenPath = len("/revilr/")
@@ -23,19 +23,19 @@ func main() {
 	r := mux.NewRouter()
 	r.StrictSlash(true)
 
-	r.HandleFunc("/revilr/post", postRevil).Methods("POST")
+	r.HandleFunc("/post", postRevil).Methods("POST")
 	r.HandleFunc("/login", loginUser).Methods("POST")
 	r.HandleFunc("/register", registerUser).Methods("POST")
 
-	r.HandleFunc("/revilr", indexHandler)
-	r.HandleFunc("/revilr/{type:(page|image|selection)}", showRevilsOfType)
-	r.HandleFunc("/user", userHandler)
+	r.HandleFunc("/", indexHandler)
 	r.HandleFunc("/revil", revilHandler)
 
 	r.HandleFunc("/login", loginHandler)
 	r.HandleFunc("/register", registerHandler)
 
 	r.HandleFunc("/logout", logoutHandler)
+
+	r.HandleFunc("/user/{username:[a-zA-Z]+}", userHandler)
 
 	r.HandleFunc("/user_taken", userTakenHandler)
 	r.HandleFunc("/email_taken", emailTakenHandler)
@@ -96,17 +96,18 @@ func postRevil(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	revilType := request.FormValue("type")
 	url := request.FormValue("url")
 	title := request.FormValue("title")
 	note := request.FormValue("note")
-	revilType := request.FormValue("type")
+	public := request.FormValue("public") != ""
 
 	id := user.Id.Hex()
-	err = db.CreateRevil(id, revilType, url, title, note)
+	err = db.CreateRevil(id, revilType, url, title, note, public)
 	if err != nil {
 		fmt.Println(err)
 	}
-	http.Redirect(writer, request, "/revilr", http.StatusTemporaryRedirect)
+	http.Redirect(writer, request, "/", http.StatusTemporaryRedirect)
 }
 
 
@@ -134,32 +135,12 @@ func revilHandler(writer http.ResponseWriter, request *http.Request) {
 	ShowResponsePage(writer, user, "revil", m)
 }
 
-func showRevilsOfType(writer http.ResponseWriter, request *http.Request) {
-	if !ensureLoggedIn(writer, request) {
-		return
-	}
-	user, err := getUser(request)
-	if err != nil {
-		http.NotFound(writer, request)
-	}
-
-	vars := mux.Vars(request)
-	revils, err := db.GetRevilsOfType(vars["type"], *user)
-	if err != nil {
-		fmt.Println(err)
-		revils = make([]data.Revil, 0)
-	}
-
-	revilsMap := RevilsAsMap(revils)
-	ShowResponsePage(writer, user, vars["type"], revilsMap)
-}
-
 func loginUser(writer http.ResponseWriter, request *http.Request) {
 	user, canLogin := verifyUser(request)
 
 	if canLogin && user != nil {
 		if err := setUser(writer, request, *user); err == nil {
-			continueTo := "/user"
+			continueTo := "/" + user.Username
 			if val := request.FormValue("continue"); val != "" {
 				continueTo = val
 			}
@@ -175,15 +156,37 @@ func loginUser(writer http.ResponseWriter, request *http.Request) {
 }
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
-	if !ensureLoggedIn(writer, request) {
+	vars := mux.Vars(request)
+	user, err := db.FindUserByName(vars["username"])
+
+	if err != nil || user == nil {
+		http.NotFound(writer, request)
 		return
 	}
-	user, err := getUser(request)
-	if err != nil {
-		http.NotFound(writer, request)
+
+	var revils data.Revils
+	
+	loggedInUser, err := getUser(request)
+	if err == nil && loggedInUser.Id == user.Id  {
+		revils, err = db.GetAllRevilsInDatabase(*user)
+	} else {
+		revils, err = db.GetAllPublicRevils(*user)
 	}
 
-	ShowResponsePage(writer, user, "user", user.AsMap())
+	if err != nil {
+		fmt.Println(err)
+		revils = make([]data.Revil, 0)
+	}
+
+	values := RevilsAsMap(revils)
+	userMap := user.AsMap()
+
+	for key, val := range userMap {
+		values[key] = val
+	}
+
+	ShowResponsePage(writer, user, "user", values)
+	
 }
 
 func registerUser(writer http.ResponseWriter, request *http.Request) {
@@ -196,7 +199,7 @@ func registerUser(writer http.ResponseWriter, request *http.Request) {
 		if err == nil {
 			err = setUser(writer, request, user)
 			if err == nil {
-				http.Redirect(writer, request, "/user", http.StatusTemporaryRedirect)
+				http.Redirect(writer, request, "/"+user.Username, http.StatusTemporaryRedirect)
 				return
 			} else {
 				fmt.Println(err)

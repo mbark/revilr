@@ -1,7 +1,7 @@
 {{{navbar}}}
 
 <div id="main">
-  <form id="revil" name="revil" action="revilr/post" method="POST" class="form-horizontal" role="form">
+  <form id="revil" name="revil" action="/post" method="POST" class="form-horizontal" role="form">
 
     <div class="form-group">
       <label for="type" class="col-lg-2 control-label">Type</label>
@@ -32,6 +32,13 @@
       <label for="note" class="col-lg-2 control-label">Note</label>
       <div class="col-lg-10">
         <input type="text" class="form-control" id="note" name="note" placeholder="Note">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="note" class="col-lg-2 control-label">Publicly visible</label>
+      <div class="col-lg-10">
+        <input type="checkbox" class="form-control" id="public" name="public" value="public">
       </div>
     </div>
 

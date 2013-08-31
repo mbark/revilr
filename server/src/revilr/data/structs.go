@@ -15,6 +15,7 @@ type (
 		Url     string        `json:"url"     bson:"url"`
 		Title	string        `json:"title"   bson:"title"`
 		Note 	string        `json:"note"    bson:"note"`
+		Public	bool		  `json:"public"  bson:"public"`
 		Created time.Time     `json:"created" bson:"created"`
 	}
 

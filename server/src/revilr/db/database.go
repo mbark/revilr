@@ -25,8 +25,8 @@ func OpenConnection() (err error) {
 	return
 }
 
-func CreateRevil(userId, revilType, url, title, note string) error {
-	rev := data.CreateRevil(revilType, url, title, note)
+func CreateRevil(userId, revilType, url, title, note string, public bool) error {
+	rev := data.CreateRevil(revilType, url, title, note, public)
 	rev.UserId = bson.ObjectIdHex(userId)
 
 	collection := database.C(revilsC)
@@ -40,9 +40,9 @@ func GetAllRevilsInDatabase(user data.User) (revils data.Revils, err error) {
 	return
 }
 
-func GetRevilsOfType(rtype string, user data.User) (revils data.Revils, err error) {
+func GetAllPublicRevils(user data.User) (revils data.Revils, err error) {
 	collection := database.C(revilsC)
-	err = collection.Find(bson.M{"type": rtype, "uid": user.Id}).Sort("-created").All(&revils)
+	err = collection.Find(bson.M{"public": true, "uid": user.Id}).Sort("-created").All(&revils)
 	return
 }
 
