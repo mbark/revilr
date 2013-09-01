@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"revilr/data"
@@ -11,6 +12,10 @@ const (
 	url     = "127.0.0.1"
 	usersC  = "users"
 	revilsC = "revils"
+)
+
+var (
+	ErrVerificationDoesNotMatch = errors.New("Verification does not match expected value")
 )
 
 var database *mgo.Database
@@ -73,5 +78,24 @@ func CreateUser(username, password, email string) (user data.User, err error) {
 
 	collection := database.C(usersC)
 	_, err = collection.UpsertId(user.Id, user)
+	return
+}
+
+func VerifyUser(username, verification string) (user *data.User, err error) {
+	collection := database.C(usersC)
+	err = collection.Find(bson.M{"username": username}).One(&user)
+	if err != nil {
+		return
+	}
+
+	if user.Verification != verification {
+		err = ErrVerificationDoesNotMatch
+	} else {
+		change := bson.M{"$set": bson.M{"verified": true}, "$unset": bson.M{"verification": ""}}
+		collection.Update(bson.M{"_id": user.Id}, change)
+
+		user, err = FindUserById(user.Id.Hex())
+	}
+
 	return
 }

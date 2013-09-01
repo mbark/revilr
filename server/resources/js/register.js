@@ -1,15 +1,15 @@
-var username = document.register.username;
-var email = document.register.email;
-var password = document.register.password;
-var verification = document.register.verification;
+var username = $("#username");
+var email = $("#email");
+var password = $("#password");
+var verification = $("#verification");
 
-$("#username").blur(isUsernameValid);
+username.blur(isUsernameValid);
 
-$("#email").blur(isEmailValid);
+email.blur(isEmailValid);
 
-$("#password").blur(isPasswordValid);
+password.blur(isPasswordValid);
 
-$("#verification").blur(isVerificationValid);
+verification.blur(isVerificationValid);
 
 $("#register").submit(function() {
 	isValid = true;
@@ -19,7 +19,24 @@ $("#register").submit(function() {
 	isValid = isValid && isPasswordValid();
 	isValid = isValid && isVerificationValid();
 
-	return isValid;
+	if(isValid) {
+		$(this).ajaxSubmit({
+			url: "/register",
+			type: "POST",
+			success: function() {
+				$("#submit-alert").addClass("alert-success");
+				$("#submit-alert-text").text("A mail has been sent your email, follow instructions there to complete registration.");
+				$("#submit-alert").show();
+			},
+			error: function() {
+				$("#submit-alert").addClass("alert-danger");
+				$("#submit-alert-text").text("Unable to register user.");
+				$("#submit-alert").show();
+			}
+		});
+	}
+
+	return false;
 });
 
 function isUsernameValid() {
@@ -27,43 +44,38 @@ function isUsernameValid() {
 	var maxLength = 20;
 
 	if(isIncorrectLength(username, 5, 20)) {
-		$("#username-group").addClass("error");
-		$("#username-error-text").text("Username have a length of between " + minLength + " and " + maxLength + " characters");
-		$("#username-error").show();
+		$("#username-group").addClass("has-error");
+		$("#username-error").text("Username have a length of between " + minLength + " and " + maxLength + " characters");
 		return false;
 	} else if(isUsernameTaken(username)) {
-		$("#username-group").addClass("error");
-		$("#username-error-text").text("Username is already taken");
-		$("#username-error").show();
+		$("#username-group").addClass("has-error");
+		$("#username-error").text("Username is already taken");
 		return false;
 	} else {
-		$("#username-group").removeClass("error");
-		$("#username-error").hide();
+		$("#username-group").removeClass("has-error");
+		$("username-error").text("");
 		return true;
 	}
 }
 
 function isEmailValid() {
 	var regex = new RegExp("([a-z]*.)+@[a-z]+.[a-z]+");
-	var value = email.value
+	var value = email.val();
 	if (value == undefined) {
-		$("#email-group").addClass("error");
-		$("#email-error-text").text("Can't leave email field blank");
-		$("#email-error").show();
+		$("#email-group").addClass("has-error");
+		$("#email-error").text("Can't leave email field blank");
 		return false;
-	} else if (!regex.test(email.value)) {
-		$("#email-group").addClass("error");
-		$("#email-error-text").text("Invalid email provided");
-		$("#email-error").show();
+	} else if (!regex.test(value)) {
+		$("#email-group").addClass("has-error");
+		$("#email-error").text("Invalid email provided");
 		return false;
 	} else if (isEmailTaken(email)) {
-		$("#email-group").addClass("error");
-		$("#email-error-text").text("An account already exists with that email");
-		$("#email-error").show();
+		$("#email-group").addClass("has-error");
+		$("#email-error").text("An account already exists with that email");
 		return false;
 	} else {
-		$("#email-group").removeClass("error");
-		$("#email-error").hide();
+		$("#email-group").removeClass("has-error");
+		$("#email-error").text("");
 		return true;
 	}
 }
@@ -71,35 +83,34 @@ function isEmailValid() {
 function isPasswordValid() {
 	var minLength = 8;
 	if(isIncorrectLength(password, 8, -1)) {
-		$("#password-group").addClass("error");
-		$("#password-error-text").text("Password must be " + minLength + " characters or longer");
-		$("#password-error").show();
+		$("#password-group").addClass("has-error");
+		$("#password-error").text("Password must be " + minLength + " characters or longer");
 		return false;
 	} else {
-		$("#password-group").removeClass("error");
-		$("#password-error").hide();
+		$("#password-group").removeClass("has-error");
+		$("#password-error").text("");
 		return true;
 	}
 }
 
 function isVerificationValid() {
 	var minLength = 8;
-	if(isNotSame(password, verification)) {
-		$("#verification-group").addClass("error");
-		$("#verification-error-text").text("Passwords do not match");
-		$("#verification-error").show();
+	if(password.val() != verification.val()) {
+		$("#verification-group").addClass("has-error");
+		$("#verification-error").text("Passwords do not match");
 		return false;
 	} else {
-		$("#verification-group").removeClass("error");
-		$("#verification-error").hide();
+		$("#verification-group").removeClass("has-error");
+		$("#verification-error").text("");
 		return true;
 	}
 }
 
 function isIncorrectLength(username, min, max) {
 	var length = 0;
-	if(username.value != undefined) {
-		length = username.value.length;
+	val = username.val()
+	if(val != undefined) {
+		length = val.length
 	}
 	var isCorrectLength = true;
 	if(min >= 0) {
@@ -113,7 +124,7 @@ function isIncorrectLength(username, min, max) {
 }
 
 function isUsernameTaken(username) {
-	var name = username.value;
+	var name = username.val();
 	var isTaken = false;
 
 	$.ajax({
@@ -133,7 +144,7 @@ function isUsernameTaken(username) {
 }
 
 function isEmailTaken(email) {
-	var value = email.value;
+	var value = email.val();
 	var isTaken = false;
 
 	$.ajax({
@@ -150,8 +161,4 @@ function isEmailTaken(email) {
 	});
 
 	return isTaken;
-}
-
-function isNotSame(password1, password2) {
-	return password1.value != password2.value;
 }

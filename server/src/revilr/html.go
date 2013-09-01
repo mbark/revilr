@@ -25,6 +25,8 @@ func createPages() map[string]*mustache.Template {
 	aMap["page"] = createPage("resources/html/display.html")
 	aMap["image"] = createPage("resources/html/display.html")
 	aMap["selection"] = createPage("resources/html/display.html")
+	aMap["emailVerification"] = createPage("resources/html/emailVerification.html")
+	aMap["registerSuccessful"] = createPage("resources/html/registerSuccessful.html")
 
 	return aMap
 }
@@ -77,4 +79,15 @@ func getNavbar(page string, user *data.User) string {
 	}
 
 	return navbar.Render(data)
+}
+
+func GetEmailVerification(user data.User) string {
+	template := pageMap["emailVerification"]
+	if template == nil {
+		template = notFound
+	}
+	data := make(map[string]interface{})
+	data["verification"] = user.Verification
+	data["username"] = user.Username
+	return template.Render(data)
 }

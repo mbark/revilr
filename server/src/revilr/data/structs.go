@@ -20,10 +20,12 @@ type (
 	}
 
 	User struct {
-		Id       bson.ObjectId `json:"id"       bson:"_id"`
-		Username string        `json:"username" bson:"username"`
-		Password []byte        `json:"password" bson:"password"`
-		Email    string        `json="email"    bson:"email"`
-		Created  time.Time     `json:"created"  bson:"created"`
+		Id           bson.ObjectId `json:"id"           bson:"_id"`
+		Username     string        `json:"username"     bson:"username"`
+		Password     []byte        `json:"password"     bson:"password"`
+		Email        string        `json="email"        bson:"email"`
+		Verification string        `json="verification" bson:"verification"`
+		Verified     bool          `json="verified"     bson:"verified"`
+		Created      time.Time     `json:"created"      bson:"created"`
 	}
 )

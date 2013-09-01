@@ -4,21 +4,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"math/rand"
 	"net/http"
-	"regexp"
+	"net/smtp"
 	"revilr/data"
 	"revilr/db"
+	"time"
 )
 
-const lenPath = len("/revilr/")
-
-var validEmail = regexp.MustCompile("([a-z]*.)+@[a-z]+.[a-z]+")
+var (
+	mailAccount  = "noreply.revilr@gmail.com"
+	mailPassword = "amenVafan"
+)
 
 func main() {
 	err := db.OpenConnection()
 	if err != nil {
 		panic(err)
 	}
+
+	rand.Seed(time.Now().UnixNano())
 
 	r := mux.NewRouter()
 	r.StrictSlash(true)
@@ -32,6 +37,7 @@ func main() {
 
 	r.HandleFunc("/login", loginHandler)
 	r.HandleFunc("/register", registerHandler)
+	r.HandleFunc("/user/{username:[a-zA-Z]+}/verify", verifyRegisterHandler)
 
 	r.HandleFunc("/logout", logoutHandler)
 
@@ -139,7 +145,7 @@ func loginUser(writer http.ResponseWriter, request *http.Request) {
 
 	if canLogin && user != nil {
 		if err := setUser(writer, request, *user); err == nil {
-			continueTo := "/" + user.Username
+			continueTo := "/user/" + user.Username
 			if val := request.FormValue("continue"); val != "" {
 				continueTo = val
 			}
@@ -195,16 +201,11 @@ func registerUser(writer http.ResponseWriter, request *http.Request) {
 		email := request.FormValue("email")
 
 		user, err := db.CreateUser(username, password, email)
-		if err == nil {
-			err = setUser(writer, request, user)
-			if err == nil {
-				http.Redirect(writer, request, "/"+user.Username, http.StatusTemporaryRedirect)
-				return
-			} else {
-				fmt.Println(err)
-			}
-		} else {
+		if err != nil {
 			fmt.Println(err)
+			return
+		} else {
+			sendVerificationMail(user)
 		}
 	} else {
 		fmt.Println("Invalid register")
@@ -218,9 +219,6 @@ func isValidRegister(request *http.Request) bool {
 	email := request.FormValue("email")
 
 	if len(username) < 5 || len(username) > 20 {
-		return false
-	}
-	if !validEmail.MatchString(email) {
 		return false
 	}
 	if len(password) < 8 {
@@ -237,6 +235,55 @@ func isValidRegister(request *http.Request) bool {
 	}
 
 	return true
+}
+
+func sendVerificationMail(user data.User) {
+	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	subject := "Subject: Verification email for revilr\n"
+	msg := subject + mime + GetEmailVerification(user)
+
+	auth := smtp.PlainAuth("", mailAccount, mailPassword, "smtp.gmail.com")
+
+	go func(user data.User, msg string) {
+		err := smtp.SendMail(
+			"smtp.gmail.com:587",
+			auth,
+			mailAccount,
+			[]string{user.Email},
+			[]byte(msg))
+
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(user, msg)
+}
+
+func verifyRegisterHandler(writer http.ResponseWriter, request *http.Request) {
+	user, err := finishVerification(writer, request)
+	if err != nil {
+		fmt.Println("Unable to finish verification", err)
+		http.NotFound(writer, request)
+		return
+	}
+
+	vals := make(map[string]interface{})
+	vals["username"] = user.Username
+
+	ShowResponsePage(writer, user, "registerSuccessful", vals)
+}
+
+func finishVerification(writer http.ResponseWriter, request *http.Request) (user *data.User, err error) {
+	vars := mux.Vars(request)
+	username := vars["username"]
+	verification := request.FormValue("verification")
+
+	user, err = db.VerifyUser(username, verification)
+	if err != nil {
+		return
+	}
+	err = setUser(writer, request, *user)
+
+	return
 }
 
 func logoutHandler(writer http.ResponseWriter, request *http.Request) {
@@ -283,6 +330,7 @@ func verifyUser(request *http.Request) (*data.User, bool) {
 	user, err := db.FindUserByName(username)
 	if err == nil && user != nil {
 		canLogin := user.PasswordMatches(password)
+		canLogin = canLogin && user.Verified
 		return user, canLogin
 	}
 	return nil, false

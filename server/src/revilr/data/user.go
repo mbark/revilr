@@ -6,17 +6,24 @@ import (
 	"fmt"
 	"io"
 	"labix.org/v2/mgo/bson"
+	"math/rand"
 	"strings"
 )
 
 func CreateUser(username string, password, email string) (user User, err error) {
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	m := md5.New()
+	io.WriteString(m, fmt.Sprintf("%s", rand.Intn(100)))
+	verification := fmt.Sprintf("%x", m.Sum(nil))
+
 	user = User{
-		Id:       bson.NewObjectId(),
-		Username: username,
-		Email:    email,
-		Password: hashedPass,
-		Created:  bson.Now(),
+		Id:           bson.NewObjectId(),
+		Username:     username,
+		Email:        email,
+		Password:     hashedPass,
+		Verification: verification,
+		Verified:     false,
+		Created:      bson.Now(),
 	}
 	return
 }
