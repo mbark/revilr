@@ -47,10 +47,17 @@ func main() {
 	r.HandleFunc("/email_taken", emailTakenHandler)
 	r.HandleFunc("/user_valid", isValidUserHandler)
 
+	r.NotFoundHandler = http.HandlerFunc(notFoundHandler)
+
 	http.Handle("/", r)
 	http.Handle("/resources/", http.StripPrefix("/resources/", http.FileServer(http.Dir("resources"))))
 
 	http.ListenAndServe(":8080", nil)
+}
+
+func notFoundHandler(writer http.ResponseWriter, request *http.Request) {
+	html := RenderNotFoundPage()
+	fmt.Fprintf(writer, html)
 }
 
 func ensureLoggedIn(writer http.ResponseWriter, request *http.Request) bool {

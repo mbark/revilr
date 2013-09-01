@@ -53,6 +53,10 @@ func RenderWithAdditionalData(page string, user *data.User, data map[string]inte
 	return template.RenderInLayout(layout, data)
 }
 
+func RenderNotFoundPage() string {
+	return notFound.RenderInLayout(layout, make(map[string]interface{}))
+}
+
 func RevilsAsMap(revils []data.Revil) map[string]interface{} {
 	revilsMap := make([]map[string]interface{}, len(revils))
 
