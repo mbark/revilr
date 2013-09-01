@@ -53,7 +53,7 @@ function isUsernameValid() {
 		return false;
 	} else {
 		$("#username-group").removeClass("has-error");
-		$("username-error").text("");
+		$("#username-error").text("");
 		return true;
 	}
 }

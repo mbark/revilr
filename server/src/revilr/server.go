@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"math/rand"
@@ -15,6 +15,8 @@ import (
 var (
 	mailAccount  = "noreply.revilr@gmail.com"
 	mailPassword = "amenVafan"
+
+	ErrInvalidRegistration = errors.New("Invalid parameters for registration")
 )
 
 func main() {
@@ -56,17 +58,48 @@ func main() {
 }
 
 func notFoundHandler(writer http.ResponseWriter, request *http.Request) {
+	fmt.Println("Unable to find page")
+
 	html := RenderNotFoundPage()
+	writer.WriteHeader(404)
 	fmt.Fprintf(writer, html)
 }
 
-func ensureLoggedIn(writer http.ResponseWriter, request *http.Request) bool {
-	loggedIn := isLoggedIn(request)
-	if !loggedIn {
+func errorHandler(writer http.ResponseWriter, request *http.Request, err error) {
+	fmt.Println("Unexpected error occurred", err)
+
+	html := RenderInternalErrorPage()
+	writer.WriteHeader(500)
+	fmt.Fprintf(writer, html)
+}
+
+func ensureLoggedIn(writer http.ResponseWriter, request *http.Request) (user *data.User, isLoggedIn bool) {
+	user, err := getUser(request)
+	isLoggedIn = user != nil
+
+	if err != nil {
+		err = logOut(writer, request)
+		if err != nil {
+			errorHandler(writer, request, err)
+			return
+		}
+	}
+
+	if !isLoggedIn {
 		http.Redirect(writer, request, "/login?continue="+request.URL.Path, http.StatusMovedPermanently)
 	}
 
-	return loggedIn
+	return
+}
+
+func getUser(request *http.Request) (user *data.User, err error) {
+	userId, err := getUserId(request)
+	if err != nil {
+		return
+	}
+
+	user, err = db.FindUserById(userId)
+	return
 }
 
 func loginHandler(writer http.ResponseWriter, request *http.Request) {
@@ -74,8 +107,8 @@ func loginHandler(writer http.ResponseWriter, request *http.Request) {
 	if cont := request.FormValue("continue"); cont != "" {
 		m["continue"] = request.FormValue("continue")
 	}
-	user, _ := getUser(request)
 
+	user, _ := getUser(request)
 	ShowResponsePage(writer, user, "login", m)
 }
 
@@ -85,14 +118,14 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
-	if !ensureLoggedIn(writer, request) {
+	user, loggedIn := ensureLoggedIn(writer, request)
+	if !loggedIn {
 		return
 	}
-	user, err := getUser(request)
 
 	revils, err := db.GetAllRevils(*user)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Unable to get all revils", err)
 		revils = make([]data.Revil, 0)
 	}
 
@@ -101,11 +134,8 @@ func indexHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func postRevil(writer http.ResponseWriter, request *http.Request) {
-	if !ensureLoggedIn(writer, request) {
-		return
-	}
-	user, err := getUser(request)
-	if err != nil {
+	user, loggedIn := ensureLoggedIn(writer, request)
+	if !loggedIn {
 		return
 	}
 
@@ -116,78 +146,92 @@ func postRevil(writer http.ResponseWriter, request *http.Request) {
 	public := request.FormValue("public") != ""
 
 	id := user.Id.Hex()
-	err = db.CreateRevil(id, revilType, url, title, note, public)
+	err := db.CreateRevil(id, revilType, url, title, note, public)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Unable to create revil", err)
 	}
+
 	http.Redirect(writer, request, "/", http.StatusTemporaryRedirect)
 }
 
 func revilHandler(writer http.ResponseWriter, request *http.Request) {
-	if !ensureLoggedIn(writer, request) {
+	user, loggedIn := ensureLoggedIn(writer, request)
+	if !loggedIn{
 		return
-	}
-	user, err := getUser(request)
-	if err != nil {
-		http.NotFound(writer, request)
 	}
 
 	m := make(map[string]interface{})
-	if url := request.FormValue("url"); url != "" {
-		m["url"] = url
-	}
+	addToMap(request, "url", m)
+	addToMap(request, "title", m)
+
 	if revilType := request.FormValue("type"); revilType != "" {
 		m[revilType] = true
 		m["type"] = revilType
-	}
-	if title := request.FormValue("title"); title != "" {
-		m["title"] = title
 	}
 
 	ShowResponsePage(writer, user, "revil", m)
 }
 
-func loginUser(writer http.ResponseWriter, request *http.Request) {
-	user, canLogin := verifyUser(request)
-
-	if canLogin && user != nil {
-		if err := setUser(writer, request, *user); err == nil {
-			continueTo := "/user/" + user.Username
-			if val := request.FormValue("continue"); val != "" {
-				continueTo = val
-			}
-			http.Redirect(writer, request, continueTo, http.StatusMovedPermanently)
-			return
-		} else {
-			fmt.Println("Unable to set user", err)
-		}
-	} else {
-		fmt.Println("Unable to login", canLogin, user)
+func addToMap(request *http.Request, name string, m map[string]interface{}) {
+	if val := request.FormValue(name); val != "" {
+		m[name] = val
 	}
-	http.NotFound(writer, request)
 }
+
+func loginUser(writer http.ResponseWriter, request *http.Request) {
+	user, canLogin := isValidLogin(request)
+
+	if !canLogin {
+		fmt.Println("Unable to login")
+		loginHandler(writer, request)
+		return
+	}
+
+	err := setUser(writer, request, *user)
+	if err != nil {
+		errorHandler(writer, request, err)
+		return
+	}
+
+	continueTo := "/user/" + user.Username
+	if val := request.FormValue("continue"); val != "" {
+		continueTo = val
+	}
+
+	http.Redirect(writer, request, continueTo, http.StatusMovedPermanently)
+}
+
+func isValidLogin(request *http.Request) (*data.User, bool) {
+	username := request.FormValue("username")
+	password := request.FormValue("password")
+
+	user, err := db.FindUserByName(username)
+	if err == nil && user != nil {
+		canLogin := user.PasswordMatches(password)
+		canLogin = canLogin && user.Verified
+		return user, canLogin
+	}
+	return nil, false
+}
+
 
 func userHandler(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	user, err := db.FindUserByName(vars["username"])
 
 	if err != nil || user == nil {
-		http.NotFound(writer, request)
+		notFoundHandler(writer, request)
 		return
 	}
 
-	var revils data.Revils
+	revils := make([]data.Revil, 0)
 
 	loggedInUser, err := getUser(request)
-	if err == nil && loggedInUser.Id == user.Id {
+
+	if loggedInUser != nil && loggedInUser.Id == user.Id {
 		revils, err = db.GetAllRevils(*user)
 	} else {
 		revils, err = db.GetAllPublicRevils(*user)
-	}
-
-	if err != nil {
-		fmt.Println(err)
-		revils = make([]data.Revil, 0)
 	}
 
 	values := RevilsAsMap(revils)
@@ -202,21 +246,21 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func registerUser(writer http.ResponseWriter, request *http.Request) {
-	if isValidRegister(request) {
-		username := request.FormValue("username")
-		password := request.FormValue("password")
-		email := request.FormValue("email")
-
-		user, err := db.CreateUser(username, password, email)
-		if err != nil {
-			fmt.Println(err)
-			return
-		} else {
-			sendVerificationMail(user)
-		}
-	} else {
-		fmt.Println("Invalid register")
+	if !isValidRegister(request) {
+		errorHandler(writer, request, ErrInvalidRegistration)
 	}
+
+	username := request.FormValue("username")
+	password := request.FormValue("password")
+	email := request.FormValue("email")
+
+	user, err := db.CreateUser(username, password, email)
+	if err != nil {
+		errorHandler(writer, request, err)
+		return
+	}
+	
+	sendVerificationMail(user)
 }
 
 func isValidRegister(request *http.Request) bool {
@@ -228,16 +272,20 @@ func isValidRegister(request *http.Request) bool {
 	if len(username) < 5 || len(username) > 20 {
 		return false
 	}
+
 	if len(password) < 8 {
 		return false
 	}
+
 	if password != verification {
 		return false
 	}
-	if tmp, _ := verifyUser(request); tmp != nil {
+
+	if db.UserExistsWithName(username) {
 		return false
 	}
-	if tmp, _ := db.FindUserByEmail(email); tmp != nil {
+
+	if db.UserExistsWithEmail(email) {
 		return false
 	}
 
@@ -260,7 +308,7 @@ func sendVerificationMail(user data.User) {
 			[]byte(msg))
 
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Unable to send mail", err)
 		}
 	}(user, msg)
 }
@@ -268,8 +316,8 @@ func sendVerificationMail(user data.User) {
 func verifyRegisterHandler(writer http.ResponseWriter, request *http.Request) {
 	user, err := finishVerification(writer, request)
 	if err != nil {
-		fmt.Println("Unable to finish verification", err)
-		http.NotFound(writer, request)
+		fmt.Println("Unable to finish verification")
+		errorHandler(writer, request, err)
 		return
 	}
 
@@ -301,71 +349,7 @@ func logoutHandler(writer http.ResponseWriter, request *http.Request) {
 	ShowResponsePage(writer, nil, "logout", make(map[string]interface{}))
 }
 
-func emailTakenHandler(writer http.ResponseWriter, request *http.Request) {
-	email := request.FormValue("email")
-	user, _ := db.FindUserByEmail(email)
-	isTaken := user != nil
-
-	writer.Header().Set("Content-Type", "application/json")
-	fmt.Fprint(writer, Response{"isTaken": isTaken})
-}
-
-func userTakenHandler(writer http.ResponseWriter, request *http.Request) {
-	user, _ := verifyUser(request)
-	isTaken := user != nil
-
-	writer.Header().Set("Content-Type", "application/json")
-	fmt.Fprint(writer, Response{"isTaken": isTaken})
-}
-
-func isValidUserHandler(writer http.ResponseWriter, request *http.Request) {
-	isValid := false
-	_, canLogin := verifyUser(request)
-
-	if canLogin {
-		isValid = true
-	}
-
-	writer.Header().Set("Content-Type", "application/json")
-	fmt.Fprint(writer, Response{"isValid": isValid})
-}
-
-func verifyUser(request *http.Request) (*data.User, bool) {
-	username := request.FormValue("username")
-	password := request.FormValue("password")
-
-	user, err := db.FindUserByName(username)
-	if err == nil && user != nil {
-		canLogin := user.PasswordMatches(password)
-		canLogin = canLogin && user.Verified
-		return user, canLogin
-	}
-	return nil, false
-}
-
-func getUser(request *http.Request) (user *data.User, err error) {
-	userId, err := getUserId(request)
-	if err != nil {
-		return
-	}
-
-	user, err = db.FindUserById(userId)
-	return
-}
-
 func ShowResponsePage(writer http.ResponseWriter, user *data.User, name string, data map[string]interface{}) {
 	html := RenderWithAdditionalData(name, user, data)
 	fmt.Fprintf(writer, html)
-}
-
-type Response map[string]interface{}
-
-func (r Response) String() (s string) {
-	b, err := json.Marshal(r)
-	if err != nil {
-		s = ""
-		return
-	}
-	s = string(b)
-	return
 }

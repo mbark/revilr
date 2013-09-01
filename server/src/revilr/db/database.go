@@ -51,10 +51,20 @@ func GetAllPublicRevils(user data.User) (revils data.Revils, err error) {
 	return
 }
 
+func UserExistsWithName(name string) bool {
+	user, _ := FindUserByName(name)
+	return user != nil
+}
+
+func UserExistsWithEmail(email string) bool {
+	user, _ := FindUserByEmail(email)
+	return user != nil
+}
+
 func FindUserById(userId string) (user *data.User, err error) {
 	collection := database.C(usersC)
 	id := bson.ObjectIdHex(userId)
-	err = collection.Find(bson.M{"_id": id}).One(&user)
+	err = collection.FindId(id).One(&user)
 	return
 }
 

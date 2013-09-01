@@ -6,9 +6,10 @@ import (
 )
 
 var (
-	layout   = createPage("resources/html/layout.html")
-	navbar   = createPage("resources/html/navbar.html")
-	notFound = createPage("resources/html/notfound.html")
+	layout        = createPage("resources/html/layout.html")
+	navbar        = createPage("resources/html/navbar.html")
+	notFound      = createPage("resources/html/notfound.html")
+	internalError = createPage("resources/html/error.html")
 )
 
 var pageMap map[string]*mustache.Template = createPages()
@@ -55,6 +56,10 @@ func RenderWithAdditionalData(page string, user *data.User, data map[string]inte
 
 func RenderNotFoundPage() string {
 	return notFound.RenderInLayout(layout, make(map[string]interface{}))
+}
+
+func RenderInternalErrorPage() string {
+	return internalError.RenderInLayout(layout, make(map[string]interface{}))
 }
 
 func RevilsAsMap(revils []data.Revil) map[string]interface{} {
