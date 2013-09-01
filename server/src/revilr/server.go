@@ -15,7 +15,9 @@ import (
 var (
 	mailAccount  = "noreply.revilr@gmail.com"
 	mailPassword = "amenVafan"
+)
 
+var (
 	ErrInvalidRegistration = errors.New("Invalid parameters for registration")
 )
 
@@ -163,6 +165,7 @@ func revilHandler(writer http.ResponseWriter, request *http.Request) {
 	m := make(map[string]interface{})
 	addToMap(request, "url", m)
 	addToMap(request, "title", m)
+	addToMap(request, "note", m)
 
 	if revilType := request.FormValue("type"); revilType != "" {
 		m[revilType] = true

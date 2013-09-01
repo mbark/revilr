@@ -11,6 +11,7 @@ function imageOnClick(info, tab) {
 	query = "";
 	query += "type=" + "image";
 	query += "&url=" + info.srcUrl;
+	query += "&title=" + tab.title;
 
 	openPopup(query);
 }
@@ -19,7 +20,8 @@ function selectionOnClick(info, tab) {
 	query = "";
 	query += "type=" + "selection";
 	query += "&url=" + info.pageUrl;
-	query += "&title=" + info.selectionText;
+	query += "&title=" + tab.title
+	query += "&note=" + info.selectionText;
 
 	openPopup(query);
 }

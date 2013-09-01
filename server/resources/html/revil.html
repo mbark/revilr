@@ -31,7 +31,7 @@
     <div class="form-group">
       <label for="note" class="col-lg-2 control-label">Note</label>
       <div class="col-lg-4">
-        <input type="text" class="form-control" id="note" name="note" placeholder="Note">
+        <input type="text" class="form-control" id="note" name="note" placeholder="Note" {{#note}}disabled value="{{note}}"{{/note}}>
       </div>
     </div>
 
