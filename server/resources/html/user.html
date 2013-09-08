@@ -1,7 +1,7 @@
 {{{navbar}}}
 
 <div id="main">
-	<h1><img class="user-avatar img-circle" src="http://www.gravatar.com/avatar/{{emailHash}}.png"></img> {{username}}</h1>
+	{{#user}}<h1><img class="user-avatar img-circle" src="http://www.gravatar.com/avatar/{{emailHash}}.png"></img> {{username}}</h1>{{/user}}
   
   {{#revils}}{{#image}}
   <div class="panel panel-default revil">

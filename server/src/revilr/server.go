@@ -120,8 +120,10 @@ func registerHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func indexHandler(writer http.ResponseWriter, request *http.Request) {
-	user, loggedIn := ensureLoggedIn(writer, request)
-	if !loggedIn {
+	user, err := getUser(request)
+
+	if user == nil {
+		ShowResponsePage(writer, nil, "homeNotLoggedIn", make(map[string]interface{}))
 		return
 	}
 
@@ -238,11 +240,7 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	values := RevilsAsMap(revils)
-	userMap := user.AsMap()
-
-	for key, val := range userMap {
-		values[key] = val
-	}
+	values["user"] = user.AsMap()
 
 	ShowResponsePage(writer, loggedInUser, "user", values)
 

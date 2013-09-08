@@ -6,10 +6,11 @@ import (
 )
 
 var (
-	layout        = createPage("resources/html/layout.html")
-	navbar        = createPage("resources/html/navbar.html")
-	notFound      = createPage("resources/html/notfound.html")
-	internalError = createPage("resources/html/error.html")
+	layout         = createPage("resources/html/layout.html")
+	navbar         = createPage("resources/html/navbar.html")
+	loggedInNavbar = createPage("resources/html/loggedInNavbar.html")
+	notFound       = createPage("resources/html/notfound.html")
+	internalError  = createPage("resources/html/error.html")
 )
 
 var pageMap map[string]*mustache.Template = createPages()
@@ -18,6 +19,7 @@ func createPages() map[string]*mustache.Template {
 	aMap := make(map[string]*mustache.Template)
 
 	aMap["home"] = createPage("resources/html/display.html")
+	aMap["homeNotLoggedIn"] = createPage("resources/html/homeNotLoggedIn.html")
 	aMap["login"] = createPage("resources/html/login.html")
 	aMap["logout"] = createPage("resources/html/logout.html")
 	aMap["user"] = createPage("resources/html/user.html")
@@ -75,15 +77,19 @@ func RevilsAsMap(revils []data.Revil) map[string]interface{} {
 
 func RenderNavbar(page string, user *data.User) string {
 	data := make(map[string]interface{})
-	data[page] = true
+	data[page+"Page"] = true
 	data["loggedIn"] = user != nil
 
+	var html string
+
 	if user != nil {
-		data["username"] = user.Username
-		data["emailHash"] = user.EmailHash()
+		data["user"] = user.AsMap()
+		html = loggedInNavbar.Render(data)
+	} else {
+		html = navbar.Render(data)
 	}
 
-	return navbar.Render(data)
+	return html
 }
 
 func GetEmailVerification(user data.User) string {

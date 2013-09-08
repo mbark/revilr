@@ -33,6 +33,15 @@ body {
 	max-height: 100px;
 }
 
+.login-menu {
+	width: 300px;
+	padding: 5px 10px 0px 10px;
+}
+
+.btn-login-menu {
+	margin: 10px 0px 10px 0px;
+}
+
 blockquote {
 	margin: 1.5em 1em;
 	padding: .5em 1em;

@@ -12,30 +12,36 @@
 
     <div class="collapse navbar-collapse navbar-top-collapse">
       <ul class="nav navbar-nav">
-        <li class="nav-home {{#home}}active{{/home}}"><a href="/">Home</a></li>
-        <li class="nav-revil {{#revil}}active{{/revil}}"><a href="/revil">Revil</a></li>
+        <li class="nav-home {{#homePage}}active{{/homePage}}"><a href="/">Home</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        {{^username}}
-        <li class="{{#login}}active{{/login}}">
-          <a href="/login">
-            <span class="glyphicon glyphicon-log-in"></span> Log in
-          </a>
-        </li>
-        {{/username}}
-        {{#username}}
-        <li class="{{#user}}active{{/user}}">
-          <a href="/user/{{username}}">
-            <img class="navbar-avatar img-circle" src="http://www.gravatar.com/avatar/{{emailHash}}.png?s=20">{{username}}
-          </a>
-        </li>
         <li>
-          <a href="/logout">
-            <span class="glyphicon glyphicon-log-out"></span> Log out
-          </a>
+          <a href="/register">Sign Up</a>
         </li>
-        {{/username}}
-      </ul>
-    </div>
+        <li class="divider-vertical"></li>
+        <li class="dropdown">
+          <a class="dropdown-toggle" href="#" data-toggle="dropdown">
+            Sign In <strong class="caret"></strong>
+          </a>
+          <div class="dropdown-menu login-menu">
+           <form id="login" name="login" action="/login" method="POST" class="form-horizontal" role="form">
+            <input type="hidden" name="continue" id="continue" value="{{continue}}">
+            <div class="control-group">
+              <label for="username" class="control-label">Username</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+            </div>
+            <div id="password-group" class="control-group">
+              <label for="password" class="control-label">Password</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+              <div id="password-error" class="controls" style="display: none">
+                <span id="password-error-text" class="help-inline"></span>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-default btn-login-menu">Sign in</button>
+          </form>
+        </div>
+      </li>
+    </ul>
   </div>
+</div>
 </nav>
