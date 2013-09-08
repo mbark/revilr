@@ -160,7 +160,7 @@ func postRevil(writer http.ResponseWriter, request *http.Request) {
 
 func revilHandler(writer http.ResponseWriter, request *http.Request) {
 	user, loggedIn := ensureLoggedIn(writer, request)
-	if !loggedIn{
+	if !loggedIn {
 		return
 	}
 
@@ -219,7 +219,6 @@ func isValidLogin(request *http.Request) (*data.User, bool) {
 	return nil, false
 }
 
-
 func userHandler(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	user, err := db.FindUserByName(vars["username"])
@@ -260,7 +259,7 @@ func registerUser(writer http.ResponseWriter, request *http.Request) {
 		errorHandler(writer, request, err)
 		return
 	}
-	
+
 	sendVerificationMail(user)
 }
 

@@ -12,22 +12,6 @@ body {
 	margin-right: 10px;
 }
 
-.panel-title > a {
-	color: #2a6496 !important;
-	font-weight: bold;
-	font-size: 20px;
-}
-
-.revil-url {
-	cursor: default;
-	color: #aaa;
-}
-
-.revil-date {
-	float: right;
-	font-size: 11px;
-}
-
 .revil-img > img {
 	max-width: 200px;
 	max-height: 100px;
@@ -40,6 +24,10 @@ body {
 
 .btn-login-menu {
 	margin: 10px 0px 10px 0px;
+}
+
+.revil-title {
+	margin-bottom: 15px;
 }
 
 blockquote {

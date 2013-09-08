@@ -2,49 +2,65 @@
 
 <div id="main">
 	{{#user}}<h1><img class="user-avatar img-circle" src="http://www.gravatar.com/avatar/{{emailHash}}.png"></img> {{username}}</h1>{{/user}}
-  
-  {{#revils}}{{#image}}
-  <div class="panel panel-default revil">
-    <div class="panel-heading">
-      <h3 class="panel-title">
-        <a href="{{url}}">{{title}}</a>
-      </h3>
-    </div>
-    <div class="panel-body">
-      <p class="revil-url">({{display-url}})</p>
-      <a class="revil-img" href="{{url}}" title="{{Title}}">
-        <img src="{{url}}" alt="" />
-      </a>
-      <p class="revil-note">{{note}}</p>
-      <p class="revil-date">{{date}}</p>
-      <p><input type="checkbox" name="public" value="public" {{#public}}checked{{/public}} disabled> Public</p>
-    </div>
-  </div>{{/image}}{{#page}}
-  <div class="panel panel-default revil">
-    <div class="panel-heading">
-      <h3 class="panel-title">
-        <a href="{{url}}">{{title}}</a>
-      </h3>
-    </div>
-    <div class="panel-body">
-      <p class="revil-url">({{display-url}})</p>
-      <p class="revil-note">{{note}}</p>
-      <p class="revil-date">{{date}}</p>
-      <p><input type="checkbox" name="public" value="public" {{#public}}checked{{/public}} disabled> Public</p>
-    </div>
-  </div>{{/page}}{{#selection}}
-  <div class="panel panel-default revil">
-   <div class="panel-heading">
-    <h3 class="panel-title">
-      <a href="{{url}}">{{title}}</a>
-    </h3>
+
+  <div class="list-group">
+    {{#revils}}
+    {{#page}}
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-lg-8">
+          <h4 class="list-group-item-heading revil-title">
+            {{title}} <span class="glyphicon {{#public}}glyphicon-eye-open{{/public}}{{^public}}glyphicon-eye-close{{/public}}"></span>
+          </h4>
+          <p class="revil-note">{{note}}</p>
+        </div>
+        <div class="col-lg-4">
+          <a href="{{url}}" class="btn btn-lg pull-right">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+          </a>
+        </div>
+      </div>
+    </li>
+    {{/page}}
+    {{#image}}
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-lg-8">
+          <h4 class="list-group-item-heading revil-title">
+            {{title}} <span class="glyphicon {{#public}}glyphicon-eye-open{{/public}}{{^public}}glyphicon-eye-close{{/public}}"></span>
+          </h4>
+           <a class="revil-img" href="{{url}}" title="{{Title}}">
+            <img src="{{url}}" alt="" />
+          </a>
+          <p class="revil-note">{{note}}</p>
+        </div>
+        <div class="col-lg-4">
+          <a href="{{url}}" class="btn btn-lg pull-right">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+          </a>
+        </div>
+      </div>
+    </li>
+    {{/image}}
+    {{#selection}}
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-lg-8">
+          <h4 class="list-group-item-heading revil-title">
+            {{title}} <span class="glyphicon {{#public}}glyphicon-eye-open{{/public}}{{^public}}glyphicon-eye-close{{/public}}"></span>
+          </h4>
+          <blockquote>{{note}}</blockquote>
+        </div>
+        <div class="col-lg-4">
+          <a href="{{url}}" class="btn btn-lg pull-right">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+          </a>
+        </div>
+      </div>
+    </li>
+    {{/selection}}
+    {{/revils}}
   </div>
-  <div class="panel-body">
-    <p class="revil-url">({{display-url}})</p>
-    <blockquote>{{note}}</blockquote>
-    <p class="revil-date">{{date}}</p>
-    <p><input type="checkbox" name="public" value="public" {{#public}}checked{{/public}} disabled> Public</p>
-  </div>{{/selection}}{{/revils}}
 </div>
 
 <script src="/resources/fancybox/jquery.fancybox.js"></script>

@@ -11,7 +11,7 @@ const userSession = "users"
 
 var (
 	ErrUserIdOfWrongType = errors.New("User id is not of expected type")
-	ErrUserNogLoggedIn = errors.New("User is not logged in")
+	ErrUserNogLoggedIn   = errors.New("User is not logged in")
 )
 
 var store = sessions.NewCookieStore([]byte(""))
