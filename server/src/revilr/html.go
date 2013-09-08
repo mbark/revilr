@@ -40,12 +40,8 @@ func createPage(file string) *mustache.Template {
 	return tmpl
 }
 
-func Render(page string, user *data.User) string {
-	return RenderWithAdditionalData(page, user, make(map[string]interface{}))
-}
-
-func RenderWithAdditionalData(page string, user *data.User, data map[string]interface{}) string {
-	data["navbar"] = getNavbar(page, user)
+func RenderWithAdditionalData(page, navbar string, data map[string]interface{}) string {
+	data["navbar"] = navbar
 	template := pageMap[page]
 	if template == nil {
 		template = notFound
@@ -77,7 +73,7 @@ func RevilsAsMap(revils []data.Revil) map[string]interface{} {
 	return values
 }
 
-func getNavbar(page string, user *data.User) string {
+func RenderNavbar(page string, user *data.User) string {
 	data := make(map[string]interface{})
 	data[page] = true
 	data["loggedIn"] = user != nil

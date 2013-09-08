@@ -244,7 +244,7 @@ func userHandler(writer http.ResponseWriter, request *http.Request) {
 		values[key] = val
 	}
 
-	ShowResponsePage(writer, user, "user", values)
+	ShowResponsePage(writer, loggedInUser, "user", values)
 
 }
 
@@ -353,6 +353,7 @@ func logoutHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func ShowResponsePage(writer http.ResponseWriter, user *data.User, name string, data map[string]interface{}) {
-	html := RenderWithAdditionalData(name, user, data)
+	navbar := RenderNavbar(name, user)
+	html := RenderWithAdditionalData(name, navbar, data)
 	fmt.Fprintf(writer, html)
 }
