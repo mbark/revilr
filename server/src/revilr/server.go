@@ -35,6 +35,7 @@ func main() {
 	r.HandleFunc("/post", postRevil).Methods("POST")
 	r.HandleFunc("/login", loginUser).Methods("POST")
 	r.HandleFunc("/register", registerUser).Methods("POST")
+	r.HandleFunc("/delete", deleteRevil).Methods("POST")
 
 	r.HandleFunc("/", indexHandler)
 	r.HandleFunc("/revil", revilHandler)
@@ -68,7 +69,7 @@ func notFoundHandler(writer http.ResponseWriter, request *http.Request) {
 }
 
 func errorHandler(writer http.ResponseWriter, request *http.Request, err error) {
-	fmt.Println("Unexpected error occurred", err)
+	fmt.Println("Unexpected error occurred:", err)
 
 	html := RenderInternalErrorPage()
 	writer.WriteHeader(500)
@@ -152,10 +153,25 @@ func postRevil(writer http.ResponseWriter, request *http.Request) {
 	id := user.Id.Hex()
 	err := db.CreateRevil(id, revilType, url, title, note, public)
 	if err != nil {
-		fmt.Println("Unable to create revil", err)
+		errorHandler(writer, request, err)
 	}
 
 	http.Redirect(writer, request, "/", http.StatusTemporaryRedirect)
+}
+
+func deleteRevil(writer http.ResponseWriter, request *http.Request) {
+	_, loggedIn := ensureLoggedIn(writer, request)
+	if !loggedIn {
+		return
+	}
+
+	id := request.FormValue("id")
+	err := db.DeleteRevil(id)
+	if err != nil {
+		errorHandler(writer, request, err)
+	} else {
+		writer.WriteHeader(http.StatusOK)
+	}
 }
 
 func revilHandler(writer http.ResponseWriter, request *http.Request) {

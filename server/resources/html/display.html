@@ -1,16 +1,25 @@
 {{{navbar}}}
 
 <div id="main">
+  <div id="submit-alert" class="alert alert-dismissable" style="display: none">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <span id="submit-alert-text" class="help-inline"></span>
+  </div>
+
   <div class="list-group">
     {{#revils}}
     {{#page}}
-    <li class="list-group-item">
+    <li id="{{id}}" class="list-group-item">
       <div class="row">
         <div class="col-lg-8">
           <h4 class="list-group-item-heading revil-title">
             {{title}} <span class="glyphicon {{#public}}glyphicon-eye-open{{/public}}{{^public}}glyphicon-eye-close{{/public}}"></span>
           </h4>
           <p class="revil-note">{{note}}</p>
+          <form class="delete-revil">
+            <input type="hidden" name="id" value="{{id}}">
+            <button action="submit" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+          </form>
         </div>
         <div class="col-lg-4">
           <a href="{{url}}" class="btn btn-lg pull-right">
@@ -21,16 +30,20 @@
     </li>
     {{/page}}
     {{#image}}
-    <li class="list-group-item">
+    <li id="{{id}}" class="list-group-item">
       <div class="row">
         <div class="col-lg-8">
           <h4 class="list-group-item-heading revil-title">
             {{title}} <span class="glyphicon {{#public}}glyphicon-eye-open{{/public}}{{^public}}glyphicon-eye-close{{/public}}"></span>
           </h4>
-           <a class="revil-img" href="{{url}}" title="{{Title}}">
+          <a class="revil-img" href="{{url}}" title="{{Title}}">
             <img src="{{url}}" alt="" />
           </a>
           <p class="revil-note">{{note}}</p>
+          <form class="delete-revil">
+            <input type="hidden" name="id" value="{{id}}">
+            <button action="submit" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+          </form>
         </div>
         <div class="col-lg-4">
           <a href="{{url}}" class="btn btn-lg pull-right">
@@ -41,13 +54,17 @@
     </li>
     {{/image}}
     {{#selection}}
-    <li class="list-group-item">
+    <li id="{{id}}" class="list-group-item">
       <div class="row">
         <div class="col-lg-8">
           <h4 class="list-group-item-heading revil-title">
             {{title}} <span class="glyphicon {{#public}}glyphicon-eye-open{{/public}}{{^public}}glyphicon-eye-close{{/public}}"></span>
           </h4>
           <blockquote>{{note}}</blockquote>
+          <form class="delete-revil">
+            <input type="hidden" name="id" value="{{id}}">
+            <button action="submit" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+          </form>
         </div>
         <div class="col-lg-4">
           <a href="{{url}}" class="btn btn-lg pull-right">
@@ -59,5 +76,6 @@
     {{/selection}}
     {{/revils}}
   </div>
+</div>
 <script src="/resources/fancybox/jquery.fancybox.js"></script>
 <script src="/resources/js/display.js"></script>

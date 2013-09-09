@@ -39,6 +39,13 @@ func CreateRevil(userId, revilType, url, title, note string, public bool) error 
 	return err
 }
 
+func DeleteRevil(id string) error {
+	bsonId := bson.ObjectIdHex(id)
+	collection := database.C(revilsC)
+	err := collection.RemoveId(bsonId)
+	return err
+}
+
 func GetAllRevils(user data.User) (revils data.Revils, err error) {
 	collection := database.C(revilsC)
 	err = collection.Find(bson.M{"uid": user.Id}).Sort("-created").All(&revils)

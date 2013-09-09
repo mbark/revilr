@@ -22,6 +22,7 @@ func CreateRevil(revilType, url, title, note string, public bool) (rev Revil) {
 func (rev Revil) AsMap() map[string]interface{} {
 	data := make(map[string]interface{})
 
+	data["id"] = rev.Id.Hex()
 	data["url"] = rev.Url
 	data["title"] = rev.Title
 	data["note"] = rev.Note
