@@ -1,6 +1,4 @@
 *.exe
-*.db
 server/pkg/*
-revilr
 
 .DS_Store
