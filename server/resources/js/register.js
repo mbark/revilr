@@ -1,15 +1,15 @@
-var username = $("#username");
+var username = $("#register").find("#username");
 var email = $("#email");
 var password = $("#password");
 var verification = $("#verification");
 
-username.blur(isUsernameValid);
+$(document).ready(function() {
+	username.blur(isUsernameValid);
+	email.blur(isEmailValid);
+	password.blur(isPasswordValid);
+	verification.blur(isVerificationValid);
+});
 
-email.blur(isEmailValid);
-
-password.blur(isPasswordValid);
-
-verification.blur(isVerificationValid);
 
 $("#register").submit(function() {
 	isValid = true;
